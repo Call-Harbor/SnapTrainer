@@ -16,6 +16,7 @@ import FileUploader from '@/components/create/FileUploader';
 import StylePreferences from '@/components/create/StylePreferences';
 import ModelSelector from '@/components/create/ModelSelector';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import ExportPDFButton from '@/components/profile/ExportPDFButton';
 
 const fileTypeIcons = { pdf: FileText, text: FileText, image: Image, audio: Mic, other: FileText };
 
@@ -138,7 +139,13 @@ export default function AIFaceProfile() {
           </div>
         </div>
 
-        <AlertDialog>
+        <div className="flex items-center gap-2">
+          <ExportPDFButton
+            face={face}
+            knowledgeItems={knowledgeItems}
+            feedbackEntries={feedbackEntries}
+          />
+          <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
               <Trash2 className="w-4 h-4" />
@@ -159,6 +166,7 @@ export default function AIFaceProfile() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        </div>
       </div>
 
       {/* Stats */}
