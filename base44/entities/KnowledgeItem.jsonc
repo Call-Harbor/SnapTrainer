@@ -21,8 +21,59 @@
         "audio",
         "chat_export",
         "notes",
+        "url",
+        "faq",
+        "website",
+        "sitemap",
         "other"
       ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Original URL for web crawling sources"
+    },
+    "crawl_mode": {
+      "type": "string",
+      "enum": [
+        "smart",
+        "single",
+        "sitemap",
+        "docs"
+      ],
+      "description": "How the web source should be crawled"
+    },
+    "crawl_depth": {
+      "type": "string",
+      "enum": [
+        "page",
+        "section",
+        "site"
+      ],
+      "description": "Depth for web crawling"
+    },
+    "include_patterns": {
+      "type": "string",
+      "description": "URL patterns to include when crawling"
+    },
+    "exclude_patterns": {
+      "type": "string",
+      "description": "URL patterns to exclude when crawling"
+    },
+    "question": {
+      "type": "string",
+      "description": "FAQ question"
+    },
+    "answer": {
+      "type": "string",
+      "description": "FAQ answer"
+    },
+    "tags": {
+      "type": "string",
+      "description": "Comma-separated tags for FAQ or web training source"
+    },
+    "training_text": {
+      "type": "string",
+      "description": "Structured text used as direct training context"
     },
     "extracted_summary": {
       "type": "string",

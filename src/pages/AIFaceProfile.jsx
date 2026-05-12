@@ -10,9 +10,11 @@ import {
   ArrowLeft, Brain, FileText, MessageSquare, Settings,
   Trash2, Loader2, Image, Mic, Upload, Sparkles,
   ThumbsUp, ThumbsDown, GitBranch, PenLine, Search, ShieldCheck, Workflow, CheckCircle2,
+  Globe, HelpCircle,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import FileUploader from '@/components/create/FileUploader';
+import WebKnowledgeTrainer from '@/components/create/WebKnowledgeTrainer';
 import StylePreferences from '@/components/create/StylePreferences';
 import ModelSelector from '@/components/create/ModelSelector';
 import AdvancedTrainingPanel from '@/components/create/AdvancedTrainingPanel';
@@ -21,10 +23,26 @@ import {
   normalizeAdvancedTrainingConfig,
   summarizeAdvancedTrainingForPrompt,
 } from '@/lib/advanced-training';
+import {
+  buildFaqSummary,
+  buildWebSourceSummary,
+  getValidFaqItems,
+  getValidWebSources,
+} from '@/lib/knowledge-sources';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import ExportPDFButton from '@/components/profile/ExportPDFButton';
 
-const fileTypeIcons = { pdf: FileText, text: FileText, image: Image, audio: Mic, other: FileText };
+const fileTypeIcons = {
+  pdf: FileText,
+  text: FileText,
+  image: Image,
+  audio: Mic,
+  url: Globe,
+  website: Globe,
+  sitemap: Globe,
+  faq: HelpCircle,
+  other: FileText,
+};
 
 const roles = [
   'Business advisor',
@@ -77,6 +95,8 @@ export default function AIFaceProfile() {
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [newFiles, setNewFiles] = useState([]);
+  const [newWebSources, setNewWebSources] = useState([]);
+  const [newFaqItems, setNewFaqItems] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const { data: face, isLoading } = useQuery({
@@ -157,6 +177,60 @@ export default function AIFaceProfile() {
     });
 
     setNewFiles([]);
+    setUploading(false);
+    queryClient.invalidateQueries({ queryKey: ['knowledge', id] });
+    queryClient.invalidateQueries({ queryKey: ['aiface', id] });
+  };
+
+  const handleAddWebKnowledge = async () => {
+    const validWebSources = getValidWebSources(newWebSources);
+    const validFaqItems = getValidFaqItems(newFaqItems);
+    const totalNewItems = validWebSources.length + validFaqItems.length;
+    if (totalNewItems === 0) return;
+
+    setUploading(true);
+
+    for (const source of validWebSources) {
+      const summary = buildWebSourceSummary(source);
+      await base44.entities.KnowledgeItem.create({
+        aiface_id: id,
+        file_name: source.url,
+        file_url: source.url,
+        file_type: source.crawl_mode === 'sitemap' ? 'sitemap' : 'url',
+        source_url: source.url,
+        crawl_mode: source.crawl_mode,
+        crawl_depth: source.crawl_depth,
+        include_patterns: source.include_patterns,
+        exclude_patterns: source.exclude_patterns,
+        tags: source.notes,
+        training_text: summary,
+        extracted_summary: summary,
+        status: 'ready',
+      });
+    }
+
+    for (const item of validFaqItems) {
+      const summary = buildFaqSummary(item);
+      await base44.entities.KnowledgeItem.create({
+        aiface_id: id,
+        file_name: item.question.slice(0, 80),
+        file_url: `faq:${item.question.slice(0, 80)}`,
+        file_type: 'faq',
+        question: item.question,
+        answer: item.answer,
+        tags: item.tags,
+        training_text: summary,
+        extracted_summary: summary,
+        status: 'ready',
+      });
+    }
+
+    await base44.entities.AIFace.update(id, {
+      total_files: (face?.total_files || 0) + totalNewItems,
+    });
+
+    setNewWebSources([]);
+    setNewFaqItems([]);
     setUploading(false);
     queryClient.invalidateQueries({ queryKey: ['knowledge', id] });
     queryClient.invalidateQueries({ queryKey: ['aiface', id] });
@@ -375,6 +449,29 @@ export default function AIFaceProfile() {
                 <Button onClick={handleUploadMore} disabled={uploading} className="gap-2">
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                   Upload {newFiles.length} fil{newFiles.length !== 1 ? 'er' : ''}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Globe className="w-4 h-4" /> Træn med URL'er og FAQ'er
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <WebKnowledgeTrainer
+                webSources={newWebSources}
+                onWebSourcesChange={setNewWebSources}
+                faqItems={newFaqItems}
+                onFaqItemsChange={setNewFaqItems}
+                disabled={uploading}
+              />
+              {(getValidWebSources(newWebSources).length > 0 || getValidFaqItems(newFaqItems).length > 0) && (
+                <Button onClick={handleAddWebKnowledge} disabled={uploading} className="gap-2">
+                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
+                  Gem web/FAQ-træning
                 </Button>
               )}
             </CardContent>
