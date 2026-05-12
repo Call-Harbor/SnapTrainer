@@ -44,6 +44,16 @@ VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
 
 Run the app: `npm run dev`
 
+**Engine quality checks**
+
+Run the SnapTrainer orchestration regression harness:
+
+```
+npm run eval:engine
+```
+
+The harness exercises vague prompts, incomplete instructions, conflicting instructions, multi-step tasks, memory-dependent tasks, and clarification-needed tasks.
+
 **Publish your changes**
 
 Open [Base44.com](http://Base44.com) and click on Publish.
