@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,10 +44,7 @@ export default function WebKnowledgeTrainer({
             <Globe className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm">Web crawling & FAQ training</h3>
-              <Badge variant="outline" className="text-[10px]">for everyone</Badge>
-            </div>
+            <h3 className="font-semibold text-sm">Web crawling & FAQ training</h3>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
               Add URLs, documentation pages, sitemap rules and FAQs, so the AIFace can use them in its knowledge sweep.
             </p>
