@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft, Brain, FileText, MessageSquare, Settings,
   Trash2, Loader2, Image, Mic, Upload, Sparkles,
-  ThumbsUp, ThumbsDown, GitBranch, PenLine, Search, ShieldCheck, Workflow,
+  ThumbsUp, ThumbsDown, GitBranch, PenLine, Search, ShieldCheck, Workflow, CheckCircle2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import FileUploader from '@/components/create/FileUploader';
@@ -30,11 +30,26 @@ const roles = [
 ];
 
 const specialistAgents = [
-  { name: 'Orchestrator', icon: Workflow, text: 'Vælger om opgaven skal løses direkte eller deles op.' },
+  { name: 'Orchestrator', icon: Workflow, text: 'Vælger workflow, execution mode og hvilke agenter der skal aktiveres.' },
+  { name: 'Memory', icon: Brain, text: 'Henter relevant profil, feedback, filer og samtalehistorik.' },
   { name: 'Planner', icon: GitBranch, text: 'Omsætter mål til delopgaver, rækkefølge og næste skridt.' },
   { name: 'Research', icon: Search, text: 'Finder relevante vinkler og vidensbehov i konteksten.' },
+  { name: 'Analyst', icon: Brain, text: 'Prioriterer indsigter og beslutningspunkter.' },
   { name: 'Writer', icon: PenLine, text: 'Former svaret i AIFacets tone og sprog.' },
+  { name: 'Organizer', icon: GitBranch, text: 'Gør output handlingsklart med struktur og opfølgning.' },
   { name: 'Reviewer', icon: ShieldCheck, text: 'Tjekker output for klarhed, relevans og mangler.' },
+  { name: 'Guardrail', icon: ShieldCheck, text: 'Markerer datagrænser, usikkerhed og behov for afklaring.' },
+];
+
+const orchestrationFeatures = [
+  'Task decomposition',
+  'Dynamic routing',
+  'Sequential execution',
+  'Parallel lanes',
+  'Context handoff',
+  'Review and verification',
+  'Retry, fallback og escalation',
+  'Synligt aktivitetsfeed',
 ];
 
 export default function AIFaceProfile() {
@@ -340,15 +355,23 @@ export default function AIFaceProfile() {
         </TabsContent>
 
         <TabsContent value="orchestration" className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {orchestrationFeatures.map((feature) => (
+              <Card key={feature} className="p-3 border-border/50">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 mb-2" />
+                <p className="text-xs font-medium leading-snug">{feature}</p>
+              </Card>
+            ))}
+          </div>
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Workflow className="w-4 h-4" /> Usynligt specialistteam
+                <Workflow className="w-4 h-4" /> Fleet-style specialistteam
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                {face.name} svarer som én samlet AI-identitet, men SnapTrainer kan route større opgaver gennem flere specialister og vise aktiviteten i chatten.
+                {face.name} svarer som én samlet AI-identitet, men SnapTrainer planlægger større opgaver som et workflow med afhængigheder, parallelle lanes, handoffs, review og recovery.
               </p>
               <div className="grid gap-3">
                 {specialistAgents.map((agent) => (
