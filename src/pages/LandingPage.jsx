@@ -11,7 +11,6 @@ import {
   HeartHandshake,
   Layers,
   ShieldCheck,
-  Sparkles,
   Upload,
   Workflow,
 } from 'lucide-react';
@@ -19,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import DonationButton from '@/components/DonationButton';
 import { openSourceMessage } from '@/lib/donations';
+import SnapTrainerLogo from '@/components/SnapTrainerLogo';
 
 const pillars = [
   {
@@ -59,13 +59,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background overflow-hidden">
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              Snap<span className="text-primary">Trainer</span>
-            </span>
+          <Link to="/" className="flex items-center">
+            <SnapTrainerLogo className="h-9 w-auto" />
           </Link>
 
           <nav className="flex items-center gap-2">
@@ -94,7 +89,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary mb-5">
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Brain className="w-3.5 h-3.5" />
                   Open source personal AI platform
                 </div>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.02]">
