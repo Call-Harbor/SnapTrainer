@@ -51,8 +51,14 @@ SnapTrainer now treats each user message as an orchestration run rather than a s
 
 ## Key modules
 
-- `src/engine/contracts.js` - schemas, lifecycle constants and contracts.
-- `src/engine/blackboard.js` - shared state and checkpoints.
+- `src/engine/executionModes.js` - execution modes, run statuses and lifecycle stages.
+- `src/engine/runState.js` - formal SnapTrainer run contract and state schema.
+- `src/engine/runLifecycle.js` - explicit plan/execute/evaluate transitions and invalid-transition prevention.
+- `src/engine/orchestrationEvents.js` - structured event type constants and event factory.
+- `src/engine/blackboard.js` - shared run-state store operations, checkpoints, subtask results, routing decisions and handoffs.
+- `src/engine/retryPolicy.js` - bounded retry rules and retry recording.
+- `src/engine/outputValidation.js` - validation for structured intermediate and final outputs.
+- `src/engine/contracts.js` - compatibility exports for schemas and contracts used by older engine modules.
 - `src/engine/memory.js` - memory partitions and governance boundaries.
 - `src/engine/orchestrator.js` - intent interpretation, complexity assessment and task decomposition.
 - `src/engine/agents.js` - specialist agent execution.
@@ -61,6 +67,36 @@ SnapTrainer now treats each user message as an orchestration run rather than a s
 - `src/engine/telemetry.js` - structured events and latency capture.
 - `src/engine/runner.js` - run lifecycle executor.
 - `src/engine/eval-harness.js` - reusable benchmark harness.
+
+## Phase 1 run state contract
+
+Every engine run now has one shared state shape:
+
+- `runId`
+- `userId`
+- `sessionId`
+- `userGoal`
+- `interpretedIntent`
+- `executionMode`
+- `status`
+- `currentStage`
+- `subtasks`
+- `assignedAgents`
+- `intermediateOutputs`
+- `evaluation`
+- `retries`
+- `startedAt`
+- `updatedAt`
+- `completedAt`
+- `finalOutput`
+- `errors`
+- `clarificationNeeded`
+- `checkpoints`
+- `routingDecisions`
+- `handoffs`
+- `telemetry`
+
+The canonical schema lives in `src/engine/runState.js`.
 
 ## Regression harness
 

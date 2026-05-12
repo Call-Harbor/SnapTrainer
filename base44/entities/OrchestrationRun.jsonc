@@ -10,6 +10,10 @@
       "type": "string",
       "description": "Conversation session this run belongs to"
     },
+    "user_id": {
+      "type": "string",
+      "description": "User identifier when available"
+    },
     "run_id": {
       "type": "string",
       "description": "Stable run identifier from the SnapTrainer engine"
@@ -30,6 +34,15 @@
         "failed"
       ]
     },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "plan",
+        "execute",
+        "evaluate"
+      ],
+      "description": "Current lifecycle stage"
+    },
     "execution_mode": {
       "type": "string"
     },
@@ -39,6 +52,24 @@
     "run_state": {
       "type": "object",
       "description": "Full blackboard state for checkpoint restore and future mission control"
+    },
+    "assigned_agents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "final_output": {
+      "type": "string"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "clarification_needed": {
+      "type": "boolean"
     },
     "telemetry_events": {
       "type": "array",

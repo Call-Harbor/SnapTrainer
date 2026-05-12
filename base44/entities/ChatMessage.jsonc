@@ -234,6 +234,29 @@
       "type": "object",
       "description": "Structured blackboard run state for orchestration debugging and checkpoint restore"
     },
+    "run_id": {
+      "type": "string",
+      "description": "SnapTrainer engine run identifier"
+    },
+    "current_stage": {
+      "type": "string",
+      "description": "Run lifecycle stage at message completion"
+    },
+    "final_output": {
+      "type": "string",
+      "description": "Validated final output from the engine"
+    },
+    "errors": {
+      "type": "array",
+      "description": "Structured errors recorded during the run",
+      "items": {
+        "type": "object"
+      }
+    },
+    "clarification_needed": {
+      "type": "boolean",
+      "description": "Whether the engine determined that clarification is needed"
+    },
     "telemetry_events": {
       "type": "array",
       "description": "Structured telemetry events emitted during the orchestration run",

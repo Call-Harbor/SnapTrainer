@@ -59,6 +59,11 @@ export function runStateToActivityPlan(runState) {
 export function runStateToChatMetadata(runState) {
   const activity = runStateToActivityPlan(runState);
   return {
+    run_id: runState.runId,
+    current_stage: runState.currentStage,
+    final_output: runState.finalOutput,
+    errors: runState.errors,
+    clarification_needed: runState.clarificationNeeded,
     orchestration_mode: runState.executionMode === 'direct_response' ? 'direct' : 'orchestrated',
     orchestration_summary: activity.summary,
     collaboration_mode: runState.executionMode,
