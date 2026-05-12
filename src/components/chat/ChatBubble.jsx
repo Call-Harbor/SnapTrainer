@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { Sparkles, User } from 'lucide-react';
+import OrchestrationActivity from './OrchestrationActivity';
 
 export default function ChatBubble({ message, aiFaceName }) {
   const isUser = message.role === 'user';
@@ -45,6 +46,14 @@ export default function ChatBubble({ message, aiFaceName }) {
             >
               {message.content}
             </ReactMarkdown>
+          )}
+          {!isUser && message.agent_trace?.length > 0 && (
+            <OrchestrationActivity
+              plan={{
+                summary: message.orchestration_summary,
+                trace: message.agent_trace,
+              }}
+            />
           )}
         </div>
       </div>

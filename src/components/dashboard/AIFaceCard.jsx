@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, FileText, Sparkles, ArrowRight } from 'lucide-react';
+import { GitBranch, MessageSquare, FileText, Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -46,7 +46,9 @@ export default function AIFaceCard({ face, index }) {
                 )}
                 <div>
                   <h3 className="font-semibold text-lg leading-tight">{face.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{modelLabels[face.model] || face.model}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {face.role || 'Personlig AI'} · {modelLabels[face.model] || face.model}
+                  </p>
                 </div>
               </div>
               <Badge variant="outline" className={cn("text-xs", status.color)}>
@@ -69,6 +71,10 @@ export default function AIFaceCard({ face, index }) {
                 <span className="flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5" />
                   {face.total_files || 0}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <GitBranch className="w-3.5 h-3.5" />
+                  agents
                 </span>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />

@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { Upload, FileText, Image, Mic, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 const fileTypeIcons = {
   pdf: FileText,

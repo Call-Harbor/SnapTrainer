@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft, Brain, FileText, MessageSquare, Settings,
   Trash2, Loader2, Image, Mic, Upload, Sparkles,
-  ThumbsUp, ThumbsDown,
+  ThumbsUp, ThumbsDown, GitBranch, PenLine, Search, ShieldCheck, Workflow,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import FileUploader from '@/components/create/FileUploader';
@@ -19,6 +19,23 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import ExportPDFButton from '@/components/profile/ExportPDFButton';
 
 const fileTypeIcons = { pdf: FileText, text: FileText, image: Image, audio: Mic, other: FileText };
+
+const roles = [
+  'Business advisor',
+  'Studiemakker',
+  'Planner',
+  'Creative partner',
+  'Support specialist',
+  'Personlig assistent',
+];
+
+const specialistAgents = [
+  { name: 'Orchestrator', icon: Workflow, text: 'Vælger om opgaven skal løses direkte eller deles op.' },
+  { name: 'Planner', icon: GitBranch, text: 'Omsætter mål til delopgaver, rækkefølge og næste skridt.' },
+  { name: 'Research', icon: Search, text: 'Finder relevante vinkler og vidensbehov i konteksten.' },
+  { name: 'Writer', icon: PenLine, text: 'Former svaret i AIFacets tone og sprog.' },
+  { name: 'Reviewer', icon: ShieldCheck, text: 'Tjekker output for klarhed, relevans og mangler.' },
+];
 
 export default function AIFaceProfile() {
   const { id } = useParams();
@@ -50,11 +67,13 @@ export default function AIFaceProfile() {
 
   const [preferences, setPreferences] = useState(null);
   const [model, setModel] = useState(null);
+  const [role, setRole] = useState(null);
 
   React.useEffect(() => {
     if (face && !preferences) {
       setPreferences(face.style_preferences || {});
       setModel(face.model);
+      setRole(face.role || face.style_preferences?.role || 'Personlig assistent');
     }
   }, [face]);
 
@@ -64,12 +83,14 @@ export default function AIFaceProfile() {
     let identityParts = [];
     if (preferences?.tone) identityParts.push(`Tone: ${preferences.tone}`);
     if (preferences?.language) identityParts.push(`Sprog: ${preferences.language}`);
+    if (role) identityParts.push(`Rolle: ${role}`);
     if (preferences?.verbosity) identityParts.push(`Detaljering: ${preferences.verbosity}`);
     if (preferences?.formality) identityParts.push(`Formalitet: ${preferences.formality}`);
 
     await base44.entities.AIFace.update(id, {
       model,
-      style_preferences: preferences,
+      role,
+      style_preferences: { ...preferences, role },
       identity_prompt: identityParts.join('\n'),
     });
 
@@ -134,7 +155,7 @@ export default function AIFaceProfile() {
             </div>
             <div>
               <h1 className="text-xl font-bold">{face.name}</h1>
-              <p className="text-sm text-muted-foreground">Profil & indstillinger</p>
+              <p className="text-sm text-muted-foreground">{face.role || 'Personlig AI-identitet'} · Profil & indstillinger</p>
             </div>
           </div>
         </div>
@@ -203,12 +224,15 @@ export default function AIFaceProfile() {
       )}
 
       <Tabs defaultValue="settings" className="space-y-6">
-        <TabsList className="grid grid-cols-3">
+        <TabsList className="grid grid-cols-4">
           <TabsTrigger value="settings" className="gap-1.5">
             <Settings className="w-3.5 h-3.5" /> Indstillinger
           </TabsTrigger>
           <TabsTrigger value="knowledge" className="gap-1.5">
             <FileText className="w-3.5 h-3.5" /> Viden
+          </TabsTrigger>
+          <TabsTrigger value="orchestration" className="gap-1.5">
+            <Workflow className="w-3.5 h-3.5" /> Orkestrering
           </TabsTrigger>
           <TabsTrigger value="feedback" className="gap-1.5">
             <Brain className="w-3.5 h-3.5" /> Adaptation
@@ -216,6 +240,29 @@ export default function AIFaceProfile() {
         </TabsList>
 
         <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">AIFace-rolle</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {roles.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setRole(item)}
+                    className={`rounded-xl border px-3 py-2 text-left text-sm transition-all ${
+                      role === item
+                        ? 'border-primary bg-primary/5 text-primary shadow-sm'
+                        : 'border-border/50 hover:bg-secondary/60'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle className="text-base">AI-model</CardTitle>
@@ -288,6 +335,37 @@ export default function AIFaceProfile() {
                   Upload {newFiles.length} fil{newFiles.length !== 1 ? 'er' : ''}
                 </Button>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="orchestration" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Workflow className="w-4 h-4" /> Usynligt specialistteam
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {face.name} svarer som én samlet AI-identitet, men SnapTrainer kan route større opgaver gennem flere specialister og vise aktiviteten i chatten.
+              </p>
+              <div className="grid gap-3">
+                {specialistAgents.map((agent) => (
+                  <div key={agent.name} className="flex items-start gap-3 rounded-xl border border-border/50 p-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <agent.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium">{agent.name}</p>
+                        <Badge variant="outline" className="text-[10px]">aktiv ved behov</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{agent.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
