@@ -1,4 +1,5 @@
 import { EXECUTION_MODES, RUN_STATUSES } from './contracts.js';
+import { recordRetry } from './retryPolicy.js';
 
 export function decideRecovery(runState, evaluation) {
   if (evaluation.passed) return { action: 'accept' };
@@ -35,16 +36,14 @@ export function decideRecovery(runState, evaluation) {
   };
 }
 
-export function applyRecoveryState(runState, decision) {
+export function applyRecoveryState(runState, decision, telemetry) {
   if (decision.action === 'accept') return;
 
   runState.status = RUN_STATUSES.RECOVERING;
-  runState.retries.push({
+  recordRetry(runState, {
     target: decision.targetSubtaskId || decision.action,
     reason: decision.reason || '',
-    attempt: runState.retries.length + 1,
-    ts: new Date().toISOString(),
-  });
+  }, telemetry);
 
   if (decision.executionMode) {
     runState.executionMode = decision.executionMode;

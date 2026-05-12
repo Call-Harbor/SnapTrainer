@@ -1,6 +1,8 @@
 import { AgentOutputSchema } from './contracts.js';
 import { buildAgentContext } from './memory.js';
 import { validateAgentOutput } from './validation.js';
+import { validateIntermediateOutput } from './outputValidation.js';
+import { ENGINE_EVENT_TYPES } from './orchestrationEvents.js';
 
 export const specialistAgents = {
   intent: 'Intent parser',
@@ -53,12 +55,23 @@ export async function executeAgent({ runState, subtask, priorOutputs, invokeLLM,
 
     const candidate = {
       agentId: subtask.assignedAgent,
+      subtaskId: subtask.id,
       status: response ? 'success' : 'low_confidence',
       output: String(response || ''),
       confidence: response ? 0.76 : 0.2,
       uncertainty: response ? '' : 'Empty LLM response',
       structured: { subtaskId: subtask.id },
     };
+
+    const structuredValidation = validateIntermediateOutput(candidate);
+    if (!structuredValidation.success) {
+      telemetry.record({
+        stage: 'execute',
+        type: ENGINE_EVENT_TYPES.OUTPUT_VALIDATION_FAILED,
+        message: `${subtask.assignedAgent} output failed structured validation`,
+        data: { subtaskId: subtask.id, error: structuredValidation.error.message },
+      });
+    }
 
     const validation = validateAgentOutput(candidate);
     const output = validation.value;

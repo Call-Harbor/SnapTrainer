@@ -1,22 +1,18 @@
-function id(prefix) {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
+import { createEngineEvent } from './orchestrationEvents.js';
 
 export function createTelemetry(runId) {
   const events = [];
 
   const record = ({ stage, type, message, data = {}, latencyMs, tokenUsage }) => {
-    const event = {
-      id: id('evt'),
+    const event = createEngineEvent({
       runId,
-      ts: new Date().toISOString(),
       stage,
       type,
       message,
       data,
-      ...(typeof latencyMs === 'number' ? { latencyMs } : {}),
-      ...(tokenUsage ? { tokenUsage } : {}),
-    };
+      latencyMs,
+      tokenUsage,
+    });
     events.push(event);
     return event;
   };

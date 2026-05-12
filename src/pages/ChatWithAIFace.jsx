@@ -122,12 +122,18 @@ export default function ChatWithAIFace() {
           await base44.entities.OrchestrationRun.create({
             aiface_id: id,
             session_id: activeSessionId,
+          user_id: null,
             run_id: runResult.runState.runId,
             user_goal: content,
             status: runResult.runState.status,
+          current_stage: runResult.runState.currentStage,
             execution_mode: runResult.runState.executionMode,
             interpreted_intent: runResult.runState.interpretedIntent,
             run_state: runResult.runState,
+          assigned_agents: runResult.runState.assignedAgents,
+          final_output: runResult.runState.finalOutput,
+          errors: runResult.runState.errors,
+          clarification_needed: runResult.runState.clarificationNeeded,
             telemetry_events: runResult.runState.telemetry,
             evaluation_result: runResult.evaluation,
           });

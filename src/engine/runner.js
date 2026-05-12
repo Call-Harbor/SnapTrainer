@@ -1,12 +1,26 @@
-import { attachTelemetry, checkpoint, createRunState, validateRunState } from './blackboard.js';
+import {
+  addHandoff,
+  addIntermediateOutput,
+  addRoutingDecision,
+  addSubtasks,
+  attachTelemetry,
+  checkpoint,
+  createRunState,
+  requireClarification,
+  validateRunState,
+} from './blackboard.js';
 import { executeAgent } from './agents.js';
 import { buildPlan } from './orchestrator.js';
 import { createMemoryPartitions, buildGovernanceBoundaries } from './memory.js';
 import { createTelemetry, summarizeLatency } from './telemetry.js';
-import { EXECUTION_MODES, LIFECYCLE_STAGES, RUN_STATUSES } from './contracts.js';
+import { EXECUTION_MODES, RUN_STATUSES } from './executionModes.js';
 import { evaluateRun } from './evaluator.js';
 import { applyRecoveryState, decideRecovery } from './recovery.js';
 import { validateFinalOutput } from './validation.js';
+import { markRunCompleted, transitionStage } from './runLifecycle.js';
+import { setFinalOutput } from './runState.js';
+import { validateStructuredFinalOutput } from './outputValidation.js';
+import { ENGINE_EVENT_TYPES } from './orchestrationEvents.js';
 
 function dependenciesMet(subtask, subtasks) {
   return subtask.dependencies.every((id) => subtasks.find((candidate) => candidate.id === id)?.status === 'completed');
@@ -36,8 +50,13 @@ async function executeSequential(runState, invokeLLM, telemetry) {
       invokeLLM,
       telemetry,
     });
-    runState.intermediateOutputs.push(output);
-    runState.boundaries.agentGeneratedText.push(output.output);
+    addIntermediateOutput(runState, output, telemetry);
+    addHandoff(runState, {
+      from: subtask.dependencies.join(', ') || 'run_context',
+      to: subtask.id,
+      agentId: subtask.assignedAgent,
+      payloadRefs: output.structured,
+    }, telemetry);
     checkpoint(runState, `after_${subtask.id}`);
   }
 }
@@ -51,7 +70,7 @@ async function executeParallel(runState, invokeLLM, telemetry) {
     invokeLLM,
     telemetry,
   });
-  runState.intermediateOutputs.push(firstOutput);
+  addIntermediateOutput(runState, firstOutput, telemetry);
   first.status = firstOutput.status === 'success' ? 'completed' : 'failed';
 
   const ready = runState.subtasks.slice(1).filter((subtask) => dependenciesMet(subtask, runState.subtasks));
@@ -67,8 +86,13 @@ async function executeParallel(runState, invokeLLM, telemetry) {
     )
   );
   outputs.forEach((output) => {
-    runState.intermediateOutputs.push(output);
-    runState.boundaries.agentGeneratedText.push(output.output);
+    addIntermediateOutput(runState, output, telemetry);
+    addHandoff(runState, {
+      from: output.structured?.subtaskId || 'parallel_context',
+      to: 'parallel_aggregation',
+      agentId: output.agentId,
+      payloadRefs: output.structured,
+    }, telemetry);
   });
   checkpoint(runState, 'after_parallel_execution');
 }
@@ -114,6 +138,8 @@ Create the final unified AIFace response. Do not expose raw agent labels unless 
 
 export async function executeSnapTrainerRun({
   userGoal,
+  userId = null,
+  sessionId = null,
   face,
   sessionMessages,
   feedbackEntries,
@@ -123,7 +149,7 @@ export async function executeSnapTrainerRun({
 }) {
   const memory = createMemoryPartitions({ face, sessionMessages, feedbackEntries, knowledgeItems });
   const boundaries = buildGovernanceBoundaries(memory, userGoal);
-  const runState = createRunState({ userGoal, memory, boundaries });
+  const runState = createRunState({ userGoal, userId, sessionId, memory, boundaries });
   const telemetry = createTelemetry(runState.runId);
   const emit = (event) => {
     telemetry.events.push(event);
@@ -138,21 +164,37 @@ export async function executeSnapTrainerRun({
 
   telemetry.record({
     stage: 'plan',
-    type: 'run.created',
+    type: ENGINE_EVENT_TYPES.RUN_CREATED,
     message: 'Created SnapTrainer run state',
-    data: { runId: runState.runId },
+    data: { runId: runState.runId, userId, sessionId },
   });
 
+  transitionStage(runState, 'plan', telemetry, { reason: 'run_initialized' });
   const plan = buildPlan({ userGoal, memory });
   runState.interpretedIntent = plan.interpretedIntent;
   runState.executionMode = plan.executionMode;
-  runState.subtasks = plan.subtasks;
+  runState.clarificationNeeded = plan.interpretedIntent.needsClarification;
+  runState.clarificationQuestion = plan.interpretedIntent.clarificationQuestion || '';
+  addSubtasks(runState, plan.subtasks, telemetry);
+  addRoutingDecision(runState, {
+    executionMode: plan.executionMode,
+    complexity: plan.interpretedIntent.complexity,
+    needsClarification: plan.interpretedIntent.needsClarification,
+    assignedAgents: runState.assignedAgents,
+  }, telemetry);
   attachTelemetry(runState, telemetry);
   checkpoint(runState, 'planned');
 
   telemetry.record({
     stage: 'plan',
-    type: 'orchestration.decision',
+    type: ENGINE_EVENT_TYPES.INTENT_INTERPRETED,
+    message: 'Intent interpreted',
+    data: runState.interpretedIntent,
+  });
+
+  telemetry.record({
+    stage: 'plan',
+    type: ENGINE_EVENT_TYPES.EXECUTION_MODE_SELECTED,
     message: `Selected ${runState.executionMode}`,
     data: {
       complexity: runState.interpretedIntent.complexity,
@@ -161,8 +203,7 @@ export async function executeSnapTrainerRun({
     },
   });
 
-  runState.status = RUN_STATUSES.EXECUTING;
-  runState.lifecycleStage = LIFECYCLE_STAGES.EXECUTE;
+  transitionStage(runState, 'execute', telemetry, { reason: 'plan_completed' });
 
   if (runState.executionMode === EXECUTION_MODES.PARALLEL) {
     await executeParallel(runState, invokeLLM, telemetry);
@@ -172,23 +213,32 @@ export async function executeSnapTrainerRun({
 
   const finalCandidate = await synthesizeFinal({ runState, invokeLLM, telemetry });
   const finalValidation = validateFinalOutput(finalCandidate);
-  runState.finalResult = finalValidation.ok ? finalValidation.output : '';
+  const structuredFinalValidation = validateStructuredFinalOutput(finalCandidate);
+  if (!structuredFinalValidation.success) {
+    telemetry.record({
+      stage: 'execute',
+      type: ENGINE_EVENT_TYPES.OUTPUT_VALIDATION_FAILED,
+      message: 'Final output failed structured validation',
+      data: { error: structuredFinalValidation.error.message },
+    });
+  }
+  setFinalOutput(runState, finalValidation.ok ? finalValidation.output : '');
 
-  runState.status = RUN_STATUSES.EVALUATING;
-  runState.lifecycleStage = LIFECYCLE_STAGES.EVALUATE;
+  transitionStage(runState, 'evaluate', telemetry, { reason: 'execution_completed' });
   const evaluation = evaluateRun(runState, runState.finalResult);
+  runState.evaluation = evaluation;
   runState.evaluationResults.push(evaluation);
 
   telemetry.record({
     stage: 'evaluate',
-    type: 'evaluation.score',
+    type: ENGINE_EVENT_TYPES.EVALUATION_COMPLETED,
     message: `Evaluation ${evaluation.passed ? 'passed' : 'failed'} with ${evaluation.overall}`,
     data: evaluation,
   });
 
   const recovery = decideRecovery(runState, evaluation);
   if (recovery.action !== 'accept') {
-    applyRecoveryState(runState, recovery);
+    applyRecoveryState(runState, recovery, telemetry);
     telemetry.record({
       stage: 'recover',
       type: 'recovery.decision',
@@ -210,25 +260,24 @@ export async function executeSnapTrainerRun({
           invokeLLM,
           telemetry,
         });
-        runState.intermediateOutputs.push(output);
-        runState.finalResult = validateFinalOutput(await synthesizeFinal({ runState, invokeLLM, telemetry })).output;
+        addIntermediateOutput(runState, output, telemetry);
+        const retryFinal = validateFinalOutput(await synthesizeFinal({ runState, invokeLLM, telemetry }));
+        setFinalOutput(runState, retryFinal.output || runState.finalOutput);
       }
     } else if (recovery.action === 'fallback') {
-      runState.finalResult = runState.finalResult || 'I cannot complete this reliably yet. Please clarify the desired outcome, constraints, and audience.';
+      setFinalOutput(runState, runState.finalResult || 'I cannot complete this reliably yet. Please clarify the desired outcome, constraints, and audience.');
     }
   }
 
   if (runState.interpretedIntent.needsClarification) {
+    requireClarification(runState, runState.interpretedIntent.clarificationQuestion, telemetry);
     runState.status = RUN_STATUSES.NEEDS_CLARIFICATION;
   }
 
-  runState.status = runState.status === RUN_STATUSES.NEEDS_CLARIFICATION
-    ? RUN_STATUSES.NEEDS_CLARIFICATION
-    : RUN_STATUSES.COMPLETED;
-  runState.completedAt = new Date().toISOString();
+  markRunCompleted(runState, telemetry);
   telemetry.record({
     stage: 'complete',
-    type: 'run.completed',
+    type: ENGINE_EVENT_TYPES.RUN_COMPLETED,
     message: 'Run completed',
     data: {
       status: runState.status,
