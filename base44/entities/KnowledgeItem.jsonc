@@ -1,0 +1,46 @@
+{
+  "name": "KnowledgeItem",
+  "type": "object",
+  "properties": {
+    "aiface_id": {
+      "type": "string",
+      "description": "Reference to the AIFace"
+    },
+    "file_name": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "pdf",
+        "text",
+        "image",
+        "audio",
+        "chat_export",
+        "notes",
+        "other"
+      ]
+    },
+    "extracted_summary": {
+      "type": "string",
+      "description": "AI-extracted summary of the file content"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "ready",
+        "failed"
+      ],
+      "default": "processing"
+    }
+  },
+  "required": [
+    "aiface_id",
+    "file_name",
+    "file_url"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "FeedbackEntry",
+  "type": "object",
+  "properties": {
+    "aiface_id": {
+      "type": "string"
+    },
+    "message_id": {
+      "type": "string",
+      "description": "The message this feedback is about"
+    },
+    "feedback_type": {
+      "type": "string",
+      "enum": [
+        "thumbs_up",
+        "thumbs_down",
+        "correction",
+        "style_hint"
+      ]
+    },
+    "feedback_text": {
+      "type": "string",
+      "description": "User's correction or hint text"
+    }
+  },
+  "required": [
+    "aiface_id",
+    "feedback_type"
+  ]
+}

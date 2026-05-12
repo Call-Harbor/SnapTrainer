@@ -1,0 +1,87 @@
+{
+  "name": "AIFace",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the AIFace agent"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Avatar image URL"
+    },
+    "model": {
+      "type": "string",
+      "enum": [
+        "gpt_5_mini",
+        "gemini_3_flash",
+        "gpt_5_4",
+        "claude_sonnet_4_6",
+        "claude_opus_4_6"
+      ],
+      "description": "Selected AI model"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "building",
+        "ready",
+        "training"
+      ],
+      "default": "building"
+    },
+    "identity_prompt": {
+      "type": "string",
+      "description": "System prompt built from user uploads and preferences"
+    },
+    "style_preferences": {
+      "type": "object",
+      "description": "Style settings like tone, language, verbosity",
+      "properties": {
+        "tone": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "verbosity": {
+          "type": "string",
+          "enum": [
+            "kort",
+            "medium",
+            "detaljeret"
+          ]
+        },
+        "formality": {
+          "type": "string",
+          "enum": [
+            "uformel",
+            "neutral",
+            "formel"
+          ]
+        }
+      }
+    },
+    "knowledge_summary": {
+      "type": "string",
+      "description": "AI-generated summary of what the agent has learned"
+    },
+    "total_messages": {
+      "type": "number",
+      "default": 0
+    },
+    "total_files": {
+      "type": "number",
+      "default": 0
+    },
+    "feedback_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Accumulated adaptation score"
+    }
+  },
+  "required": [
+    "name",
+    "model"
+  ]
+}
