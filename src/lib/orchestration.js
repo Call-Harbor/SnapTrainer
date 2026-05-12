@@ -466,7 +466,10 @@ function executionModeFor(collaborationMode) {
 export function buildOrchestrationPlan(content = '', options = {}) {
   const signals = getSignals(content, options);
   const signalCount = Object.values(signals).filter(Boolean).length;
-  const collaborationMode = selectCollaborationMode(content, signals, signalCount);
+  const preferredMode = options.preferredMode && options.preferredMode !== 'auto'
+    ? options.preferredMode
+    : null;
+  const collaborationMode = preferredMode || selectCollaborationMode(content, signals, signalCount);
   const subtasks = buildSubtasks(collaborationMode, signals);
   const trace = buildTraceFromSubtasks(subtasks);
   const selectedAgents = trace.map((step) => step.agent_id);

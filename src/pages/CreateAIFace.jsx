@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ModelSelector from '@/components/create/ModelSelector';
 import StylePreferences from '@/components/create/StylePreferences';
 import FileUploader from '@/components/create/FileUploader';
+import AdvancedTrainingPanel from '@/components/create/AdvancedTrainingPanel';
+import { defaultAdvancedTrainingConfig, summarizeAdvancedTrainingForPrompt } from '@/lib/advanced-training';
 
 const roles = [
   'Business advisor',
@@ -24,6 +26,7 @@ const steps = [
   { title: 'Navngiv', subtitle: 'Giv dit AIFace en identitet og rolle' },
   { title: 'Vælg model', subtitle: 'Vælg den AI-motor der passer dig' },
   { title: 'Stilpræferencer', subtitle: 'Fortæl hvordan din AI skal kommunikere' },
+  { title: 'Avanceret træning', subtitle: 'Valgfrit ekspertlag for AI/ML-specialister' },
   { title: 'Upload materiale', subtitle: 'Giv din AI kontekst og viden' },
 ];
 
@@ -39,6 +42,7 @@ export default function CreateAIFace() {
   const [preferences, setPreferences] = useState({
     tone: '', language: 'dansk', verbosity: 'medium', formality: 'neutral', role: 'Personlig assistent',
   });
+  const [advancedTraining, setAdvancedTraining] = useState(defaultAdvancedTrainingConfig);
   const [files, setFiles] = useState([]);
 
   const canNext = () => {
@@ -57,6 +61,8 @@ export default function CreateAIFace() {
     if (role) identityParts.push(`Rolle: ${role}`);
     identityParts.push(`Detaljering: ${preferences.verbosity}`);
     identityParts.push(`Formalitet: ${preferences.formality}`);
+    const advancedTrainingSummary = summarizeAdvancedTrainingForPrompt(advancedTraining);
+    if (advancedTrainingSummary) identityParts.push(advancedTrainingSummary);
 
     const face = await base44.entities.AIFace.create({
       name,
@@ -65,6 +71,7 @@ export default function CreateAIFace() {
       status: files.length > 0 ? 'training' : 'ready',
       identity_prompt: identityParts.join('\n'),
       style_preferences: { ...preferences, role },
+      advanced_training: advancedTraining,
       total_files: files.length,
     });
 
@@ -183,6 +190,10 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
             )}
 
             {step === 3 && (
+              <AdvancedTrainingPanel value={advancedTraining} onChange={setAdvancedTraining} />
+            )}
+
+            {step === 4 && (
               <div className="space-y-4">
                 <FileUploader files={files} onFilesChange={setFiles} uploading={uploading} />
                 <p className="text-xs text-muted-foreground">

@@ -10,6 +10,7 @@ import FeedbackBar from '@/components/chat/FeedbackBar';
 import ConversationSidebar from '@/components/chat/ConversationSidebar';
 import OrchestrationActivity from '@/components/chat/OrchestrationActivity';
 import { buildOrchestrationPlan, buildOrchestrationPrompt } from '@/lib/orchestration';
+import { formatAdvancedTrainingForPrompt, normalizeAdvancedTrainingConfig } from '@/lib/advanced-training';
 
 function generateSessionId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -94,6 +95,8 @@ export default function ChatWithAIFace() {
     if (face?.role) parts.push(`Din rolle: ${face.role}`);
     if (face?.identity_prompt) parts.push(`Brugerens præferencer:\n${face.identity_prompt}`);
     if (face?.knowledge_summary) parts.push(`Hvad du har lært om brugeren:\n${face.knowledge_summary}`);
+    const advancedTrainingPrompt = formatAdvancedTrainingForPrompt(face?.advanced_training);
+    if (advancedTrainingPrompt) parts.push(advancedTrainingPrompt);
 
     const styleHints = feedbackEntries
       .filter(f => f.feedback_type === 'style_hint' && f.feedback_text)
@@ -108,9 +111,11 @@ export default function ChatWithAIFace() {
 
   const handleSend = async (content) => {
     setSending(true);
+    const advancedTraining = normalizeAdvancedTrainingConfig(face?.advanced_training);
     const orchestrationPlan = buildOrchestrationPlan(content, {
       hasKnowledge: knowledgeItems.length > 0 || Boolean(face?.knowledge_summary),
       hasFeedback: feedbackEntries.length > 0,
+      preferredMode: advancedTraining.enabled ? advancedTraining.preferred_collaboration_mode : 'auto',
     });
     setActivePlan(orchestrationPlan);
 

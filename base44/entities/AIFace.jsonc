@@ -69,6 +69,80 @@
         }
       }
     },
+    "advanced_training": {
+      "type": "object",
+      "description": "Expert training configuration for advanced AI/ML users",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "guided",
+            "strict",
+            "experimental"
+          ]
+        },
+        "training_objective": {
+          "type": "string"
+        },
+        "system_directives": {
+          "type": "string"
+        },
+        "output_contract": {
+          "type": "string"
+        },
+        "negative_constraints": {
+          "type": "string"
+        },
+        "few_shot_examples": {
+          "type": "string"
+        },
+        "evaluation_criteria": {
+          "type": "string"
+        },
+        "memory_policy": {
+          "type": "string",
+          "enum": [
+            "minimal",
+            "adaptive",
+            "strict"
+          ]
+        },
+        "context_strategy": {
+          "type": "string",
+          "enum": [
+            "concise",
+            "balanced",
+            "deep"
+          ]
+        },
+        "preferred_collaboration_mode": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "parallel",
+            "sequential",
+            "debate",
+            "hierarchical",
+            "broadcast"
+          ]
+        },
+        "specialist_routing_notes": {
+          "type": "string"
+        },
+        "confidence_policy": {
+          "type": "string",
+          "enum": [
+            "state_uncertainty",
+            "ask_when_unclear",
+            "cite_assumptions"
+          ]
+        }
+      }
+    },
     "knowledge_summary": {
       "type": "string",
       "description": "AI-generated summary of what the agent has learned"

@@ -15,6 +15,12 @@ import { format } from 'date-fns';
 import FileUploader from '@/components/create/FileUploader';
 import StylePreferences from '@/components/create/StylePreferences';
 import ModelSelector from '@/components/create/ModelSelector';
+import AdvancedTrainingPanel from '@/components/create/AdvancedTrainingPanel';
+import {
+  defaultAdvancedTrainingConfig,
+  normalizeAdvancedTrainingConfig,
+  summarizeAdvancedTrainingForPrompt,
+} from '@/lib/advanced-training';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import ExportPDFButton from '@/components/profile/ExportPDFButton';
 
@@ -96,12 +102,14 @@ export default function AIFaceProfile() {
   const [preferences, setPreferences] = useState(null);
   const [model, setModel] = useState(null);
   const [role, setRole] = useState(null);
+  const [advancedTraining, setAdvancedTraining] = useState(defaultAdvancedTrainingConfig);
 
   React.useEffect(() => {
     if (face && !preferences) {
       setPreferences(face.style_preferences || {});
       setModel(face.model);
       setRole(face.role || face.style_preferences?.role || 'Personlig assistent');
+      setAdvancedTraining(normalizeAdvancedTrainingConfig(face.advanced_training));
     }
   }, [face]);
 
@@ -114,11 +122,14 @@ export default function AIFaceProfile() {
     if (role) identityParts.push(`Rolle: ${role}`);
     if (preferences?.verbosity) identityParts.push(`Detaljering: ${preferences.verbosity}`);
     if (preferences?.formality) identityParts.push(`Formalitet: ${preferences.formality}`);
+    const advancedTrainingSummary = summarizeAdvancedTrainingForPrompt(advancedTraining);
+    if (advancedTrainingSummary) identityParts.push(advancedTrainingSummary);
 
     await base44.entities.AIFace.update(id, {
       model,
       role,
       style_preferences: { ...preferences, role },
+      advanced_training: advancedTraining,
       identity_prompt: identityParts.join('\n'),
     });
 
@@ -252,7 +263,7 @@ export default function AIFaceProfile() {
       )}
 
       <Tabs defaultValue="settings" className="space-y-6">
-        <TabsList className="grid grid-cols-4">
+        <TabsList className="grid grid-cols-5">
           <TabsTrigger value="settings" className="gap-1.5">
             <Settings className="w-3.5 h-3.5" /> Indstillinger
           </TabsTrigger>
@@ -261,6 +272,9 @@ export default function AIFaceProfile() {
           </TabsTrigger>
           <TabsTrigger value="orchestration" className="gap-1.5">
             <Workflow className="w-3.5 h-3.5" /> Orkestrering
+          </TabsTrigger>
+          <TabsTrigger value="training" className="gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> Træning
           </TabsTrigger>
           <TabsTrigger value="feedback" className="gap-1.5">
             <Brain className="w-3.5 h-3.5" /> Adaptation
@@ -412,6 +426,23 @@ export default function AIFaceProfile() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="training" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Avanceret træning
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AdvancedTrainingPanel value={advancedTraining} onChange={setAdvancedTraining} />
+            </CardContent>
+          </Card>
+          <Button onClick={handleSave} disabled={saving} className="gap-2 shadow-lg shadow-primary/20">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            Gem træning
+          </Button>
         </TabsContent>
 
         <TabsContent value="feedback" className="space-y-6">
