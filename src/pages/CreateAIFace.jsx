@@ -19,7 +19,6 @@ import {
   getValidFaqItems,
   getValidWebSources,
 } from '@/lib/knowledge-sources';
-import { useLanguage } from '@/lib/i18n';
 
 const roles = [
   'Business advisor',
@@ -32,7 +31,6 @@ const roles = [
 
 export default function CreateAIFace() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -49,11 +47,11 @@ export default function CreateAIFace() {
   const [faqItems, setFaqItems] = useState([]);
 
   const steps = [
-    { title: t('create.stepName'), subtitle: t('create.stepNameSub') },
-    { title: t('create.stepModel'), subtitle: t('create.stepModelSub') },
-    { title: t('create.stepStyle'), subtitle: t('create.stepStyleSub') },
-    { title: t('create.stepAdvanced'), subtitle: t('create.stepAdvancedSub') },
-    { title: t('create.stepKnowledge'), subtitle: t('create.stepKnowledgeSub') },
+    { title: 'Name', subtitle: 'Give your AIFace an identity and role' },
+    { title: 'Choose model', subtitle: 'Choose freely between all models - everything is free to use' },
+    { title: 'Style preferences', subtitle: 'Tell your AI how it should communicate' },
+    { title: 'Advanced training', subtitle: 'Optional expert layer for AI/ML specialists' },
+    { title: 'Knowledge sources', subtitle: 'Upload files, crawl URLs and add FAQs' },
   ];
 
   const canNext = () => {
@@ -159,7 +157,7 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
   return (
     <div className="max-w-2xl mx-auto">
       <Button variant="ghost" className="gap-2 mb-6 text-muted-foreground" onClick={() => navigate('/')}>
-        <ArrowLeft className="w-4 h-4" /> {t('create.back')}
+        <ArrowLeft className="w-4 h-4" /> Back
       </Button>
 
       {/* Progress */}
@@ -198,9 +196,9 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
             {step === 0 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('create.nameLabel')}</Label>
+                  <Label className="text-sm font-medium">Name</Label>
                   <Input
-                    placeholder={t('create.namePlaceholder')}
+                    placeholder="E.g. 'My work assistant', 'Creative writer'..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="text-lg h-12"
@@ -208,7 +206,7 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">{t('create.roleLabel')}</Label>
+                  <Label className="text-sm font-medium">Role</Label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {roles.map((item) => (
                       <button
@@ -255,7 +253,7 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
                   disabled={uploading}
                 />
                 <p className="text-xs text-muted-foreground">
-                  {t('create.knowledgeNote')}
+                  You can always add more files, URLs and FAQs later. SnapTrainer uses the material in your AIFace knowledge sweep.
                 </p>
               </div>
             )}
@@ -270,7 +268,7 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
           disabled={step === 0}
           className="gap-2"
         >
-          <ArrowLeft className="w-4 h-4" /> {t('create.previous')}
+          <ArrowLeft className="w-4 h-4" /> Previous
         </Button>
 
         {step < steps.length - 1 ? (
@@ -279,7 +277,7 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
             disabled={!canNext()}
             className="gap-2 shadow-lg shadow-primary/20"
           >
-            {t('create.next')} <ArrowRight className="w-4 h-4" />
+            Next <ArrowRight className="w-4 h-4" />
           </Button>
         ) : (
           <Button
@@ -290,12 +288,12 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
             {creating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {uploading ? t('create.uploading') : t('create.creating')}
+                {uploading ? 'Uploading files...' : 'Creating...'}
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                {t('create.createAIFace')}
+                Create AIFace
               </>
             )}
           </Button>
