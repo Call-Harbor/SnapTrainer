@@ -7,8 +7,10 @@ import EmptyState from '@/components/dashboard/EmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Brain, GitBranch, Plus, ShieldCheck, Sparkles } from 'lucide-react';
+import { Brain, GitBranch, HeartHandshake, Plus, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import DonationButton from '@/components/DonationButton';
+import { openSourceMessage } from '@/lib/donations';
 
 export default function Dashboard() {
   const { data: faces, isLoading } = useQuery({
@@ -56,6 +58,11 @@ export default function Dashboard() {
           <p className="text-muted-foreground mt-3">
             Byg et AIFace, der lærer din tone, dine filer og dine præferencer - og lad SnapTrainer route større opgaver gennem specialister.
           </p>
+          <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <HeartHandshake className="w-5 h-5 text-emerald-600 shrink-0" />
+            <p className="text-sm text-muted-foreground flex-1">{openSourceMessage}</p>
+            <DonationButton size="sm" />
+          </div>
           <div className="flex flex-wrap gap-3 mt-6">
             <Link to="/create">
               <Button className="gap-2 shadow-lg shadow-primary/20">

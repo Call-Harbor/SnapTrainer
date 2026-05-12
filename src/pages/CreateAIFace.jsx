@@ -31,7 +31,7 @@ const roles = [
 
 const steps = [
   { title: 'Navngiv', subtitle: 'Giv dit AIFace en identitet og rolle' },
-  { title: 'Vælg model', subtitle: 'Vælg den AI-motor der passer dig' },
+  { title: 'Vælg model', subtitle: 'Vælg frit mellem alle modeller - alt er gratis at bruge' },
   { title: 'Stilpræferencer', subtitle: 'Fortæl hvordan din AI skal kommunikere' },
   { title: 'Avanceret træning', subtitle: 'Valgfrit ekspertlag for AI/ML-specialister' },
   { title: 'Knowledge sources', subtitle: 'Upload filer, crawl URLer og tilføj FAQer' },

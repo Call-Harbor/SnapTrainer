@@ -1,4 +1,18 @@
-**Welcome to your Base44 project** 
+**SnapTrainer**
+
+SnapTrainer is an open source AI platform for personal AIFaces, multi-agent orchestration, advanced training, URL/FAQ knowledge sources, and user-owned AI workflows.
+
+All models in the product are positioned as free to use. The platform is intended to be supported by voluntary donations rather than paid model tiers or paywalls.
+
+To configure the PayPal donation button, set:
+
+```
+VITE_PAYPAL_DONATION_URL=https://www.paypal.com/donate?hosted_button_id=YOUR_BUTTON_ID
+```
+
+If the variable is not set, the app falls back to PayPal's generic donation page.
+
+**Base44 project notes**
 
 **About**
 
