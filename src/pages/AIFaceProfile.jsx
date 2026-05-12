@@ -42,14 +42,27 @@ const specialistAgents = [
 ];
 
 const orchestrationFeatures = [
+  'Intent parse',
+  'Knowledge sweep',
+  'Context sweep',
+  'Causal reasoning',
+  'Unified synthesis',
+  'Proactive insight',
   'Task decomposition',
   'Dynamic routing',
-  'Sequential execution',
-  'Parallel lanes',
   'Context handoff',
-  'Review and verification',
-  'Retry, fallback og escalation',
-  'Synligt aktivitetsfeed',
+  'Evaluation gates',
+  'Retry/fallback/escalation',
+  'Single AIFace result',
+];
+
+const collaborationModes = [
+  { label: 'Auto-routing', text: 'Vælger automatisk de relevante specialistagenter.' },
+  { label: 'Parallel', text: 'Kører uafhængige perspektiver samtidigt og syntetiserer dem.' },
+  { label: 'Sequential', text: 'Sender output fra ét trin videre som kontekst til det næste.' },
+  { label: 'Debate', text: 'Afvejer modsatrettede ekspertvinkler før anbefaling.' },
+  { label: 'Hierarchical', text: 'Supervisor opdeler komplekse mål og aggregerer resultater.' },
+  { label: 'Broadcast', text: 'Scanner bredt for maksimal dækning og færre blinde vinkler.' },
 ];
 
 export default function AIFaceProfile() {
@@ -366,13 +379,21 @@ export default function AIFaceProfile() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Workflow className="w-4 h-4" /> Fleet-style specialistteam
+                <Workflow className="w-4 h-4" /> Multi-agent intelligence layer
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                {face.name} svarer som én samlet AI-identitet, men SnapTrainer planlægger større opgaver som et workflow med afhængigheder, parallelle lanes, handoffs, review og recovery.
+                {face.name} er den eneste brugerflade, men SnapTrainer fortolker mål, vælger collaboration mode, fordeler arbejdet, overfører kontekst og samler ét konsistent svar.
               </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {collaborationModes.map((mode) => (
+                  <div key={mode.label} className="rounded-xl border border-border/50 p-3">
+                    <p className="text-sm font-medium">{mode.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{mode.text}</p>
+                  </div>
+                ))}
+              </div>
               <div className="grid gap-3">
                 {specialistAgents.map((agent) => (
                   <div key={agent.name} className="flex items-start gap-3 rounded-xl border border-border/50 p-3">

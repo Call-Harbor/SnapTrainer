@@ -141,12 +141,18 @@ export default function ChatWithAIFace() {
       session_id: activeSessionId,
       orchestration_mode: orchestrationPlan.mode,
       orchestration_summary: orchestrationPlan.summary,
+      collaboration_mode: orchestrationPlan.collaboration_mode,
       workflow_type: orchestrationPlan.workflow_type,
       execution_mode: orchestrationPlan.execution_mode,
+      intelligence_layer: orchestrationPlan.intelligence_layer,
       agent_trace: orchestrationPlan.trace,
+      selected_agents: orchestrationPlan.selected_agents,
+      lifecycle: orchestrationPlan.lifecycle,
       subtasks: orchestrationPlan.subtasks,
+      handoffs: orchestrationPlan.handoffs,
       quality_gates: orchestrationPlan.quality_gates,
       recovery_policy: orchestrationPlan.recovery_policy,
+      proactive_insight_policy: orchestrationPlan.proactive_insight_policy,
     });
 
     await base44.entities.AIFace.update(id, {

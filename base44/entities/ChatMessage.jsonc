@@ -32,6 +32,18 @@
       "type": "string",
       "description": "Short user-facing summary of the orchestration flow"
     },
+    "collaboration_mode": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "parallel",
+        "sequential",
+        "debate",
+        "hierarchical",
+        "broadcast"
+      ],
+      "description": "Specialist collaboration strategy selected by the orchestrator"
+    },
     "workflow_type": {
       "type": "string",
       "description": "High-level workflow selected by the orchestrator"
@@ -41,9 +53,44 @@
       "enum": [
         "sequential",
         "parallel",
-        "hybrid"
+        "hybrid",
+        "debate",
+        "hierarchical",
+        "broadcast"
       ],
       "description": "Whether subtasks were planned as sequential, parallel, or hybrid work"
+    },
+    "intelligence_layer": {
+      "type": "string",
+      "description": "The single user-facing intelligence layer that returns the final response"
+    },
+    "selected_agents": {
+      "type": "array",
+      "description": "Agent IDs selected for this task",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lifecycle": {
+      "type": "array",
+      "description": "Intelligence lifecycle stages applied to this response",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
     },
     "agent_trace": {
       "type": "array",
@@ -67,6 +114,9 @@
             "type": "string"
           },
           "execution": {
+            "type": "string"
+          },
+          "stance": {
             "type": "string"
           },
           "depends_on": {
@@ -105,11 +155,41 @@
           "execution": {
             "type": "string"
           },
+          "lane": {
+            "type": "string"
+          },
+          "stance": {
+            "type": "string"
+          },
+          "lifecycle_stage": {
+            "type": "string"
+          },
           "depends_on": {
             "type": "array",
             "items": {
               "type": "string"
             }
+          }
+        }
+      }
+    },
+    "handoffs": {
+      "type": "array",
+      "description": "Context handoffs between subtasks",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "agent_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
           }
         }
       }
@@ -135,6 +215,10 @@
           "type": "string"
         }
       }
+    },
+    "proactive_insight_policy": {
+      "type": "string",
+      "description": "Policy for appending helpful proactive insight"
     }
   },
   "required": [
