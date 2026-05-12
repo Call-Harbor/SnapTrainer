@@ -51,12 +51,18 @@ export default function ChatBubble({ message, aiFaceName }) {
             <OrchestrationActivity
               plan={{
                 summary: message.orchestration_summary,
+                collaboration_mode: message.collaboration_mode,
                 workflow_type: message.workflow_type,
                 execution_mode: message.execution_mode,
+                intelligence_layer: message.intelligence_layer,
                 trace: message.agent_trace,
+                selected_agents: message.selected_agents,
+                lifecycle: message.lifecycle,
                 subtasks: message.subtasks,
+                handoffs: message.handoffs,
                 quality_gates: message.quality_gates,
                 recovery_policy: message.recovery_policy,
+                proactive_insight_policy: message.proactive_insight_policy,
               }}
             />
           )}
