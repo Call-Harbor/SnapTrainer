@@ -38,7 +38,7 @@ export default function ChatInput({ onSend, disabled }) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          placeholder="Skriv din besked..."
+          placeholder="Skriv naturligt - SnapTrainer klarer promptarbejdet..."
           className="min-h-[44px] max-h-[160px] resize-none rounded-xl border-border/50 bg-secondary/30 focus:bg-card"
           rows={1}
           disabled={disabled}

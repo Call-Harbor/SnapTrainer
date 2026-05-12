@@ -19,6 +19,39 @@
     "session_id": {
       "type": "string",
       "description": "Groups messages into conversations"
+    },
+    "orchestration_mode": {
+      "type": "string",
+      "enum": [
+        "direct",
+        "orchestrated"
+      ],
+      "description": "Whether SnapTrainer answered directly or routed through specialist agents"
+    },
+    "orchestration_summary": {
+      "type": "string",
+      "description": "Short user-facing summary of the orchestration flow"
+    },
+    "agent_trace": {
+      "type": "array",
+      "description": "Visible activity steps for the specialist agents used to answer",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agent_id": {
+            "type": "string"
+          },
+          "agent_name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [

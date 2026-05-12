@@ -8,6 +8,8 @@ import ChatBubble from '@/components/chat/ChatBubble';
 import ChatInput from '@/components/chat/ChatInput';
 import FeedbackBar from '@/components/chat/FeedbackBar';
 import ConversationSidebar from '@/components/chat/ConversationSidebar';
+import OrchestrationActivity from '@/components/chat/OrchestrationActivity';
+import { buildOrchestrationPlan, buildOrchestrationPrompt } from '@/lib/orchestration';
 
 function generateSessionId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -20,6 +22,7 @@ export default function ChatWithAIFace() {
   const [activeSessionId, setActiveSessionId] = useState(() => generateSessionId());
   const [sending, setSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activePlan, setActivePlan] = useState(null);
 
   const { data: face, isLoading: loadingFace } = useQuery({
     queryKey: ['aiface', id],
@@ -86,8 +89,9 @@ export default function ChatWithAIFace() {
 
   const buildSystemPrompt = () => {
     const parts = [
-      `Du er et personligt AIFace ved navn "${face?.name}". Du er brugerens personlige AI-agent.`,
+      `Du er et personligt AIFace ved navn "${face?.name}" i SnapTrainer. Du er brugerens samlede AI-identitet.`,
     ];
+    if (face?.role) parts.push(`Din rolle: ${face.role}`);
     if (face?.identity_prompt) parts.push(`Brugerens præferencer:\n${face.identity_prompt}`);
     if (face?.knowledge_summary) parts.push(`Hvad du har lært om brugeren:\n${face.knowledge_summary}`);
 
@@ -104,6 +108,8 @@ export default function ChatWithAIFace() {
 
   const handleSend = async (content) => {
     setSending(true);
+    const orchestrationPlan = buildOrchestrationPlan(content);
+    setActivePlan(orchestrationPlan);
 
     await base44.entities.ChatMessage.create({
       aiface_id: id,
@@ -117,7 +123,8 @@ export default function ChatWithAIFace() {
     // Full history for this session as context
     const historyForContext = sessionMessages.map(m => `${m.role}: ${m.content}`).join('\n');
     const systemPrompt = buildSystemPrompt();
-    const fullPrompt = `${systemPrompt}\n\nFuldstændig samtalehistorik for denne session:\n${historyForContext}\nuser: ${content}\n\nSvar som AI-agenten:`;
+    const orchestrationPrompt = buildOrchestrationPrompt(orchestrationPlan);
+    const fullPrompt = `${systemPrompt}\n\n${orchestrationPrompt}\n\nFuldstændig samtalehistorik for denne session:\n${historyForContext}\nuser: ${content}\n\nSvar som AI-agenten:`;
 
     const response = await base44.integrations.Core.InvokeLLM({
       prompt: fullPrompt,
@@ -129,6 +136,9 @@ export default function ChatWithAIFace() {
       role: 'assistant',
       content: response,
       session_id: activeSessionId,
+      orchestration_mode: orchestrationPlan.mode,
+      orchestration_summary: orchestrationPlan.summary,
+      agent_trace: orchestrationPlan.trace,
     });
 
     await base44.entities.AIFace.update(id, {
@@ -138,6 +148,7 @@ export default function ChatWithAIFace() {
     queryClient.invalidateQueries({ queryKey: ['messages', id] });
     queryClient.invalidateQueries({ queryKey: ['aiface', id] });
     setSending(false);
+    setActivePlan(null);
   };
 
   if (loadingFace) {
@@ -221,7 +232,7 @@ export default function ChatWithAIFace() {
               </div>
               <h3 className="font-semibold text-lg mb-1">Ny samtale</h3>
               <p className="text-sm text-muted-foreground max-w-md">
-                Skriv en besked til {face.name}. Jo mere du chatter, jo bedre lærer din AI dig at kende.
+                Skriv til {face.name}. Dit AIFace svarer som én personlig AI, mens SnapTrainer kan route større opgaver gennem specialistagenter.
               </p>
             </div>
           )}
@@ -249,6 +260,7 @@ export default function ChatWithAIFace() {
                   </div>
                   <span className="text-xs text-muted-foreground">Tænker...</span>
                 </div>
+                {activePlan && <OrchestrationActivity plan={activePlan} compact />}
               </div>
             </div>
           )}

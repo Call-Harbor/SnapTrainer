@@ -21,7 +21,7 @@ export default function AppLayout() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              AI<span className="text-primary">Faces</span>
+              Snap<span className="text-primary">Trainer</span>
             </span>
           </Link>
 

@@ -11,8 +11,17 @@ import ModelSelector from '@/components/create/ModelSelector';
 import StylePreferences from '@/components/create/StylePreferences';
 import FileUploader from '@/components/create/FileUploader';
 
+const roles = [
+  'Business advisor',
+  'Studiemakker',
+  'Planner',
+  'Creative partner',
+  'Support specialist',
+  'Personlig assistent',
+];
+
 const steps = [
-  { title: 'Navngiv', subtitle: 'Giv dit AIFace en identitet' },
+  { title: 'Navngiv', subtitle: 'Giv dit AIFace en identitet og rolle' },
   { title: 'Vælg model', subtitle: 'Vælg den AI-motor der passer dig' },
   { title: 'Stilpræferencer', subtitle: 'Fortæl hvordan din AI skal kommunikere' },
   { title: 'Upload materiale', subtitle: 'Giv din AI kontekst og viden' },
@@ -26,8 +35,9 @@ export default function CreateAIFace() {
 
   const [name, setName] = useState('');
   const [model, setModel] = useState('');
+  const [role, setRole] = useState('Personlig assistent');
   const [preferences, setPreferences] = useState({
-    tone: '', language: 'dansk', verbosity: 'medium', formality: 'neutral',
+    tone: '', language: 'dansk', verbosity: 'medium', formality: 'neutral', role: 'Personlig assistent',
   });
   const [files, setFiles] = useState([]);
 
@@ -44,15 +54,17 @@ export default function CreateAIFace() {
     let identityParts = [];
     if (preferences.tone) identityParts.push(`Tone: ${preferences.tone}`);
     if (preferences.language) identityParts.push(`Sprog: ${preferences.language}`);
+    if (role) identityParts.push(`Rolle: ${role}`);
     identityParts.push(`Detaljering: ${preferences.verbosity}`);
     identityParts.push(`Formalitet: ${preferences.formality}`);
 
     const face = await base44.entities.AIFace.create({
       name,
       model,
+      role,
       status: files.length > 0 ? 'training' : 'ready',
       identity_prompt: identityParts.join('\n'),
-      style_preferences: preferences,
+      style_preferences: { ...preferences, role },
       total_files: files.length,
     });
 
@@ -137,6 +149,28 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
                     autoFocus
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Rolle</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {roles.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => {
+                          setRole(item);
+                          setPreferences((current) => ({ ...current, role: item }));
+                        }}
+                        className={`rounded-xl border px-3 py-2 text-left text-sm transition-all ${
+                          role === item
+                            ? 'border-primary bg-primary/5 text-primary shadow-sm'
+                            : 'border-border/50 hover:bg-secondary/60'
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -152,7 +186,7 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
               <div className="space-y-4">
                 <FileUploader files={files} onFilesChange={setFiles} uploading={uploading} />
                 <p className="text-xs text-muted-foreground">
-                  Du kan altid uploade flere filer senere. Dit AIFace bliver mere præcist over tid.
+                  Du kan altid uploade flere filer senere. SnapTrainer bruger materialet til at gøre dit AIFace mere præcist over tid.
                 </p>
               </div>
             )}

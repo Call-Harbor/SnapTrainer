@@ -21,6 +21,10 @@
       ],
       "description": "Selected AI model"
     },
+    "role": {
+      "type": "string",
+      "description": "The user's intended role for this personal AI identity"
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -59,6 +63,9 @@
             "neutral",
             "formel"
           ]
+        },
+        "role": {
+          "type": "string"
         }
       }
     },
