@@ -9,8 +9,8 @@ import ChatInput from '@/components/chat/ChatInput';
 import FeedbackBar from '@/components/chat/FeedbackBar';
 import ConversationSidebar from '@/components/chat/ConversationSidebar';
 import OrchestrationActivity from '@/components/chat/OrchestrationActivity';
-import { buildOrchestrationPlan, buildOrchestrationPrompt } from '@/lib/orchestration';
-import { formatAdvancedTrainingForPrompt, normalizeAdvancedTrainingConfig } from '@/lib/advanced-training';
+import { executeSnapTrainerRun } from '@/engine/runner';
+import { runStateToActivityPlan, runStateToChatMetadata } from '@/engine/compat';
 
 function generateSessionId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -88,90 +88,79 @@ export default function ChatWithAIFace() {
     setSidebarOpen(false);
   };
 
-  const buildSystemPrompt = () => {
-    const parts = [
-      `You are a personal AIFace named "${face?.name}" in SnapTrainer. You are the user's unified AI identity.`,
-    ];
-    if (face?.role) parts.push(`Your role: ${face.role}`);
-    if (face?.identity_prompt) parts.push(`User preferences:\n${face.identity_prompt}`);
-    if (face?.knowledge_summary) parts.push(`What you have learned about the user:\n${face.knowledge_summary}`);
-    const advancedTrainingPrompt = formatAdvancedTrainingForPrompt(face?.advanced_training);
-    if (advancedTrainingPrompt) parts.push(advancedTrainingPrompt);
-
-    const styleHints = feedbackEntries
-      .filter(f => f.feedback_type === 'style_hint' && f.feedback_text)
-      .map(f => f.feedback_text);
-    if (styleHints.length > 0) parts.push(`Style hints from the user:\n- ${styleHints.join('\n- ')}`);
-
-    const summaries = knowledgeItems
-      .filter(k => k.extracted_summary || k.training_text)
-      .map(k => k.extracted_summary || k.training_text);
-    if (summaries.length > 0) {
-      parts.push(`Context from the user's knowledge sources, files, URL crawl instructions and FAQ training:\n${summaries.join('\n\n')}`);
-    }
-
-    return parts.join('\n\n');
-  };
-
   const handleSend = async (content) => {
     setSending(true);
-    const advancedTraining = normalizeAdvancedTrainingConfig(face?.advanced_training);
-    const orchestrationPlan = buildOrchestrationPlan(content, {
-      hasKnowledge: knowledgeItems.length > 0 || Boolean(face?.knowledge_summary),
-      hasFeedback: feedbackEntries.length > 0,
-      preferredMode: advancedTraining.enabled ? advancedTraining.preferred_collaboration_mode : 'auto',
-    });
-    setActivePlan(orchestrationPlan);
 
-    await base44.entities.ChatMessage.create({
-      aiface_id: id,
-      role: 'user',
-      content,
-      session_id: activeSessionId,
-    });
+    try {
+      await base44.entities.ChatMessage.create({
+        aiface_id: id,
+        role: 'user',
+        content,
+        session_id: activeSessionId,
+      });
 
-    queryClient.invalidateQueries({ queryKey: ['messages', id] });
+      queryClient.invalidateQueries({ queryKey: ['messages', id] });
 
-    // Full history for this session as context
-    const historyForContext = sessionMessages.map(m => `${m.role}: ${m.content}`).join('\n');
-    const systemPrompt = buildSystemPrompt();
-    const orchestrationPrompt = buildOrchestrationPrompt(orchestrationPlan);
-    const fullPrompt = `${systemPrompt}\n\n${orchestrationPrompt}\n\nFull conversation history for this session:\n${historyForContext}\nuser: ${content}\n\nAnswer as the AI agent:`;
+      const runResult = await executeSnapTrainerRun({
+        userGoal: content,
+        face,
+        sessionMessages,
+        feedbackEntries,
+        knowledgeItems,
+        invokeLLM: ({ prompt }) => base44.integrations.Core.InvokeLLM({
+          prompt,
+          model: face?.model || 'gpt_5_mini',
+        }),
+        onEvent: (_event, runState) => {
+          setActivePlan(runStateToActivityPlan(runState));
+        },
+      });
+      const metadata = runStateToChatMetadata(runResult.runState);
 
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt: fullPrompt,
-      model: face?.model || 'gpt_5_mini',
-    });
+      try {
+        if (base44.entities.OrchestrationRun) {
+          await base44.entities.OrchestrationRun.create({
+            aiface_id: id,
+            session_id: activeSessionId,
+            run_id: runResult.runState.runId,
+            user_goal: content,
+            status: runResult.runState.status,
+            execution_mode: runResult.runState.executionMode,
+            interpreted_intent: runResult.runState.interpretedIntent,
+            run_state: runResult.runState,
+            telemetry_events: runResult.runState.telemetry,
+            evaluation_result: runResult.evaluation,
+          });
+        }
+      } catch (error) {
+        console.warn('Unable to persist orchestration run', error);
+      }
 
-    await base44.entities.ChatMessage.create({
-      aiface_id: id,
-      role: 'assistant',
-      content: response,
-      session_id: activeSessionId,
-      orchestration_mode: orchestrationPlan.mode,
-      orchestration_summary: orchestrationPlan.summary,
-      collaboration_mode: orchestrationPlan.collaboration_mode,
-      workflow_type: orchestrationPlan.workflow_type,
-      execution_mode: orchestrationPlan.execution_mode,
-      intelligence_layer: orchestrationPlan.intelligence_layer,
-      agent_trace: orchestrationPlan.trace,
-      selected_agents: orchestrationPlan.selected_agents,
-      lifecycle: orchestrationPlan.lifecycle,
-      subtasks: orchestrationPlan.subtasks,
-      handoffs: orchestrationPlan.handoffs,
-      quality_gates: orchestrationPlan.quality_gates,
-      recovery_policy: orchestrationPlan.recovery_policy,
-      proactive_insight_policy: orchestrationPlan.proactive_insight_policy,
-    });
+      await base44.entities.ChatMessage.create({
+        aiface_id: id,
+        role: 'assistant',
+        content: runResult.finalOutput,
+        session_id: activeSessionId,
+        ...metadata,
+      });
 
-    await base44.entities.AIFace.update(id, {
-      total_messages: (face?.total_messages || 0) + 2,
-    });
-
-    queryClient.invalidateQueries({ queryKey: ['messages', id] });
-    queryClient.invalidateQueries({ queryKey: ['aiface', id] });
-    setSending(false);
-    setActivePlan(null);
+      await base44.entities.AIFace.update(id, {
+        total_messages: (face?.total_messages || 0) + 2,
+      });
+    } catch (error) {
+      console.error('SnapTrainer engine run failed', error);
+      await base44.entities.ChatMessage.create({
+        aiface_id: id,
+        role: 'assistant',
+        content: 'I could not complete this run reliably. Please try again or add more context so I can recover safely.',
+        session_id: activeSessionId,
+      });
+    } finally {
+      queryClient.invalidateQueries({ queryKey: ['messages', id] });
+      queryClient.invalidateQueries({ queryKey: ['aiface', id] });
+      setSending(false);
+      setActivePlan(null);
+    }
   };
 
   if (loadingFace) {

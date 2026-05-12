@@ -40,7 +40,12 @@
         "sequential",
         "debate",
         "hierarchical",
-        "broadcast"
+        "broadcast",
+        "direct_response",
+        "sequential_workflow",
+        "parallel_workflow",
+        "dynamic_handoff",
+        "reviewer_evaluator_loop"
       ],
       "description": "Specialist collaboration strategy selected by the orchestrator"
     },
@@ -56,7 +61,12 @@
         "hybrid",
         "debate",
         "hierarchical",
-        "broadcast"
+        "broadcast",
+        "direct_response",
+        "sequential_workflow",
+        "parallel_workflow",
+        "dynamic_handoff",
+        "reviewer_evaluator_loop"
       ],
       "description": "Whether subtasks were planned as sequential, parallel, or hybrid work"
     },
@@ -219,6 +229,21 @@
     "proactive_insight_policy": {
       "type": "string",
       "description": "Policy for appending helpful proactive insight"
+    },
+    "run_state": {
+      "type": "object",
+      "description": "Structured blackboard run state for orchestration debugging and checkpoint restore"
+    },
+    "telemetry_events": {
+      "type": "array",
+      "description": "Structured telemetry events emitted during the orchestration run",
+      "items": {
+        "type": "object"
+      }
+    },
+    "evaluation_result": {
+      "type": "object",
+      "description": "Final evaluator scores for the assistant response"
     }
   },
   "required": [

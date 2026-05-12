@@ -1,0 +1,58 @@
+{
+  "name": "OrchestrationRun",
+  "type": "object",
+  "properties": {
+    "aiface_id": {
+      "type": "string",
+      "description": "Reference to the AIFace"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Conversation session this run belongs to"
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Stable run identifier from the SnapTrainer engine"
+    },
+    "user_goal": {
+      "type": "string",
+      "description": "Original user goal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planning",
+        "executing",
+        "evaluating",
+        "recovering",
+        "completed",
+        "needs_clarification",
+        "failed"
+      ]
+    },
+    "execution_mode": {
+      "type": "string"
+    },
+    "interpreted_intent": {
+      "type": "object"
+    },
+    "run_state": {
+      "type": "object",
+      "description": "Full blackboard state for checkpoint restore and future mission control"
+    },
+    "telemetry_events": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "evaluation_result": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "aiface_id",
+    "run_id",
+    "user_goal"
+  ]
+}
