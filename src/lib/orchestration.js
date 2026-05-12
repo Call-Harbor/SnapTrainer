@@ -2,109 +2,109 @@ export const agentCatalog = {
   intent: {
     name: 'Intent-agent',
     capability: 'Parse',
-    description: 'Afkoder eksplicit forespørgsel, implicit behov og skjulte constraints.',
+    description: 'Decodes the explicit request, implicit need and hidden constraints.',
   },
   orchestrator: {
     name: 'Orchestrator',
     capability: 'Dynamic routing',
-    description: 'Vælger collaboration mode, agenter, afhængigheder og handoff-strategi.',
+    description: 'Selects collaboration mode, agents, dependencies and handoff strategy.',
   },
   memory: {
     name: 'Memory-agent',
     capability: 'Knowledge sweep',
-    description: 'Udvælger relevant profil, feedback, filer og samtalehistorik som arbejdskontekst.',
+    description: 'Selects relevant profile, feedback, files and conversation history as working context.',
   },
   context: {
     name: 'Context-agent',
     capability: 'Context hydration',
-    description: 'Hydrerer opgaven med aktuel AIFace-state, brugerpræferencer og sessionens retning.',
+    description: 'Hydrates the task with current AIFace state, user preferences and session direction.',
   },
   planner: {
     name: 'Planner-agent',
     capability: 'Task decomposition',
-    description: 'Bryder mål ned i delopgaver, afhængigheder, rækkefølge og checkpoints.',
+    description: 'Breaks goals into subtasks, dependencies, order and checkpoints.',
   },
   research: {
     name: 'Research-agent',
     capability: 'Research',
-    description: 'Finder relevante vinkler, antagelser, videnhuller og informationsbehov.',
+    description: 'Finds relevant angles, assumptions, knowledge gaps and information needs.',
   },
   analyst: {
     name: 'Analyst-agent',
     capability: 'Causal reasoning',
-    description: 'Leder efter årsager, tradeoffs og konsekvenser i stedet for kun overfladesvar.',
+    description: 'Looks for causes, tradeoffs and consequences instead of surface-level answers.',
   },
   strategist: {
     name: 'Strategy-agent',
     capability: 'Decision framing',
-    description: 'Vurderer muligheder, prioritering, risici og langsigtede konsekvenser.',
+    description: 'Evaluates options, prioritization, risks and long-term consequences.',
   },
   writer: {
     name: 'Writer-agent',
     capability: 'Personalized output',
-    description: 'Former svaret i brugerens foretrukne tone, sprog, længde og niveau.',
+    description: 'Shapes the answer in the user’s preferred tone, language, length and level.',
   },
   creative: {
     name: 'Creative-agent',
     capability: 'Ideation',
-    description: 'Skaber alternative vinkler, formuleringer og koncepter, når opgaven kræver variation.',
+    description: 'Creates alternative angles, wording and concepts when the task needs variation.',
   },
   organizer: {
     name: 'Organizer-agent',
     capability: 'Execution structure',
-    description: 'Gør output handlingsklart med struktur, opfølgning og næste handlinger.',
+    description: 'Makes output actionable with structure, follow-up and next actions.',
   },
   reviewer: {
     name: 'Reviewer-agent',
     capability: 'Verification',
-    description: 'Kvalitetssikrer output for relevans, klarhed, mangler og hallucinationsrisiko.',
+    description: 'Checks output for relevance, clarity, gaps and hallucination risk.',
   },
   guardrail: {
     name: 'Guardrail-agent',
     capability: 'Governance',
-    description: 'Adskiller brugerdata fra instruktioner og markerer usikkerhed eller behov for afklaring.',
+    description: 'Separates user data from instructions and flags uncertainty or clarification needs.',
   },
   synthesizer: {
     name: 'Synthesizer-agent',
     capability: 'Unified synthesis',
-    description: 'Samler flere agentoutputs til ét konsistent svar gennem AIFacets stemme.',
+    description: 'Combines multiple agent outputs into one consistent answer through the AIFace voice.',
   },
   proactive: {
     name: 'Proactive-agent',
     capability: 'Proactive insight',
-    description: 'Tilføjer den vigtigste relevante observation, brugeren ikke eksplicit bad om.',
+    description: 'Adds the most important relevant observation the user did not explicitly ask for.',
   },
   executor: {
     name: 'Executor-agent',
     capability: 'Task execution',
-    description: 'Udfører konkrete delopgaver og producerer rå output til samling.',
+    description: 'Executes concrete subtasks and produces raw output for synthesis.',
   },
 };
 
 export const orchestrationModes = {
   auto: {
     label: 'Auto-routing',
-    description: 'Orchestratoren vælger selv de mest relevante agenter, når brugeren ikke specificerer arbejdsgang.',
+    description: 'The orchestrator automatically selects the most relevant agents when the user does not specify a workflow.',
   },
   parallel: {
     label: 'Parallel execution',
-    description: 'Flere uafhængige specialistperspektiver køres samtidigt og syntetiseres til ét svar.',
+    description: 'Multiple independent specialist perspectives run at the same time and are synthesized into one answer.',
   },
   sequential: {
     label: 'Sequential chain',
-    description: 'Agenter kører i rækkefølge, hvor hvert output bliver kontekst for næste trin.',
+    description: 'Agents run in order, with each output becoming context for the next step.',
   },
   debate: {
     label: 'Agent debate',
-    description: 'Flere agenter vurderer samme beslutning fra forskellige vinkler, før et balanceret svar samles.',
+    description: 'Multiple agents evaluate the same decision from different angles before a balanced answer is assembled.',
   },
   hierarchical: {
     label: 'Hierarchical',
-    description: 'En supervisor bryder komplekse mål ned, delegerer og aggregerer resultaterne.',
+    description: 'A supervisor decomposes complex goals, delegates and aggregates the results.',
   },
   broadcast: {
     label: 'Broadcast sweep',
-    description: 'Opgaven sendes bredt gennem mange specialistvinkler for maksimal dækning og færre blinde vinkler.',
+    description: 'The task is sent broadly through many specialist angles for maximum coverage and fewer blind spots.',
   },
 };
 
@@ -112,32 +112,32 @@ export const intelligenceLifecycle = [
   {
     id: 'parse',
     title: 'Parse',
-    description: 'Afkod hvad brugeren faktisk prøver at opnå, ikke kun ordene i prompten.',
+    description: 'Decode what the user is actually trying to achieve, not only the words in the prompt.',
   },
   {
     id: 'knowledge_sweep',
     title: 'Knowledge sweep',
-    description: 'Find relevant brugerprofil, filer, feedback, eksempler og tidligere samtaler.',
+    description: 'Find relevant user profile, files, feedback, examples and previous conversations.',
   },
   {
     id: 'context_sweep',
     title: 'Context sweep',
-    description: 'Hydrer opgaven med aktuel session, rolle, modelvalg og constraints.',
+    description: 'Hydrate the task with current session, role, model choice and constraints.',
   },
   {
     id: 'causal_reasoning',
     title: 'Causal reasoning',
-    description: 'Led efter årsager, tradeoffs og konsekvenser før konklusionen formes.',
+    description: 'Look for causes, tradeoffs and consequences before shaping the conclusion.',
   },
   {
     id: 'synthesize',
     title: 'Synthesize',
-    description: 'Saml specialistresultater til ét output i AIFacets konsistente stemme.',
+    description: 'Combine specialist results into one output in the consistent AIFace voice.',
   },
   {
     id: 'proact',
     title: 'Proact',
-    description: 'Tilføj den vigtigste hjælpsomme observation eller opfølgning, hvis den er relevant.',
+    description: 'Add the most important helpful observation or follow-up if relevant.',
   },
 ];
 
@@ -268,18 +268,18 @@ function getDomainAgents(signals) {
 
 function buildFoundationTasks() {
   return [
-    makeSubtask('parse_intent', 'Parse mål, implicit behov og constraints', 'intent', {
+    makeSubtask('parse_intent', 'Parse goals, implicit needs and constraints', 'intent', {
       lifecycle_stage: 'parse',
     }),
-    makeSubtask('route_work', 'Vælg collaboration mode, specialistagenter og handoff-strategi', 'orchestrator', {
+    makeSubtask('route_work', 'Select collaboration mode, specialist agents and handoff strategy', 'orchestrator', {
       depends_on: ['parse_intent'],
       lifecycle_stage: 'parse',
     }),
-    makeSubtask('knowledge_sweep', 'Hent relevant profil, uploads, feedback og eksempler', 'memory', {
+    makeSubtask('knowledge_sweep', 'Retrieve relevant profile, uploads, feedback and examples', 'memory', {
       depends_on: ['route_work'],
       lifecycle_stage: 'knowledge_sweep',
     }),
-    makeSubtask('context_sweep', 'Hydrer opgaven med session, rolle, stil og aktuelle constraints', 'context', {
+    makeSubtask('context_sweep', 'Hydrate the task with session, role, style and current constraints', 'context', {
       depends_on: ['knowledge_sweep'],
       lifecycle_stage: 'context_sweep',
     }),
@@ -294,19 +294,19 @@ function buildModeTasks(mode, signals) {
     const parallelTasks = agents
       .filter((agent) => !['memory', 'reviewer'].includes(agent))
       .map((agent, index) =>
-        makeSubtask(`parallel_${agent}`, `${agentCatalog[agent].capability}: uafhængig specialistvinkel`, agent, {
+        makeSubtask(`parallel_${agent}`, `${agentCatalog[agent].capability}: independent specialist angle`, agent, {
           execution: 'parallel',
           lane: `lane-${index + 1}`,
           depends_on: [start],
         })
       );
-    return parallelTasks.length > 0 ? parallelTasks : [makeSubtask('execute_direct', 'Løs kerneopgaven direkte', 'executor', { depends_on: [start] })];
+    return parallelTasks.length > 0 ? parallelTasks : [makeSubtask('execute_direct', 'Solve the core task directly', 'executor', { depends_on: [start] })];
   }
 
   if (mode === 'sequential') {
     const chain = agents.filter((agent) => !['memory', 'reviewer'].includes(agent));
     return chain.map((agent, index) =>
-      makeSubtask(`chain_${agent}`, `${agentCatalog[agent].capability}: byg videre på forrige output`, agent, {
+      makeSubtask(`chain_${agent}`, `${agentCatalog[agent].capability}: build on the previous output`, agent, {
         depends_on: [index === 0 ? start : `chain_${chain[index - 1]}`],
       })
     );
@@ -314,13 +314,13 @@ function buildModeTasks(mode, signals) {
 
   if (mode === 'debate') {
     return [
-      makeSubtask('debate_user_fit', 'Vurder løsning ud fra brugerens stil, mål og præferencer', 'memory', {
+      makeSubtask('debate_user_fit', 'Evaluate the solution from the user style, goals and preferences', 'memory', {
         execution: 'parallel',
         lane: 'user-fit',
         depends_on: [start],
         stance: 'User fit',
       }),
-      makeSubtask('debate_upside', 'Argumenter for den stærkeste mulighed og dens gevinst', 'strategist', {
+      makeSubtask('debate_upside', 'Argue for the strongest option and its upside', 'strategist', {
         execution: 'parallel',
         lane: 'upside',
         depends_on: [start],
@@ -332,7 +332,7 @@ function buildModeTasks(mode, signals) {
         depends_on: [start],
         stance: 'Against',
       }),
-      makeSubtask('debate_balance', 'Find balanceret konklusion og tydelige anbefalinger', 'analyst', {
+      makeSubtask('debate_balance', 'Find a balanced conclusion and clear recommendations', 'analyst', {
         depends_on: ['debate_user_fit', 'debate_upside', 'debate_risk'],
       }),
     ];
@@ -341,11 +341,11 @@ function buildModeTasks(mode, signals) {
   if (mode === 'hierarchical') {
     const delegated = agents.filter((agent) => !['memory', 'reviewer'].includes(agent));
     return [
-      makeSubtask('supervisor_decompose', 'Supervisor opdeler målet i specialistspor og succeskriterier', 'planner', {
+      makeSubtask('supervisor_decompose', 'Supervisor decomposes the goal into specialist tracks and success criteria', 'planner', {
         depends_on: [start],
       }),
       ...delegated.map((agent, index) =>
-        makeSubtask(`delegated_${agent}`, `Delegér til ${agentCatalog[agent].name}`, agent, {
+        makeSubtask(`delegated_${agent}`, `Delegate to ${agentCatalog[agent].name}`, agent, {
           execution: 'parallel',
           lane: `specialist-${index + 1}`,
           depends_on: ['supervisor_decompose'],
@@ -389,23 +389,23 @@ function buildSynthesisTasks(mode, previousTasks) {
     : lastIds;
 
   return [
-    makeSubtask('causal_reasoning', 'Find årsager, konsekvenser og tradeoffs før slutsvaret', 'analyst', {
+    makeSubtask('causal_reasoning', 'Find causes, consequences and tradeoffs before the final answer', 'analyst', {
       depends_on: synthesisDeps.length > 0 ? synthesisDeps : lastIds,
       lifecycle_stage: 'causal_reasoning',
     }),
-    makeSubtask('unified_synthesis', 'Saml alt til ét svar gennem AIFacets stemme', 'synthesizer', {
+    makeSubtask('unified_synthesis', 'Combine everything into one answer through the AIFace voice', 'synthesizer', {
       depends_on: ['causal_reasoning'],
       lifecycle_stage: 'synthesize',
     }),
-    makeSubtask('personalized_output', 'Tilpas formulering, længde og tone til brugerprofilen', 'writer', {
+    makeSubtask('personalized_output', 'Adapt wording, length and tone to the user profile', 'writer', {
       depends_on: ['unified_synthesis'],
       lifecycle_stage: 'synthesize',
     }),
-    makeSubtask('verify_output', 'Kontroller relevans, usikkerhed, mangler og sikkerhedsgrænser', 'reviewer', {
+    makeSubtask('verify_output', 'Check relevance, uncertainty, gaps and safety boundaries', 'reviewer', {
       depends_on: ['personalized_output'],
       lifecycle_stage: 'synthesize',
     }),
-    makeSubtask('proactive_insight', 'Tilføj vigtigste relevante opfølgning, hvis den hjælper brugeren', 'proactive', {
+    makeSubtask('proactive_insight', 'Add the most relevant follow-up if it helps the user', 'proactive', {
       depends_on: ['verify_output'],
       lifecycle_stage: 'proact',
     }),
@@ -432,18 +432,18 @@ function buildTraceFromSubtasks(subtasks) {
 
 function buildQualityGates(signals, mode) {
   const gates = [
-    'Svar som ét samlet AIFace, ikke som en liste af bots',
-    'Bevar brugerens tone, rolle, sprog og ønskede detaljeniveau',
-    'Brug kun relevant kontekst fra profil, filer, feedback og samtale',
+    'Answer as one unified AIFace, not as a list of bots',
+    'Preserve the user tone, role, language and desired detail level',
+    'Use only relevant context from profile, files, feedback and conversation',
   ];
 
-  if (signals.research) gates.push('Marker antagelser, usikkerheder og videnhuller tydeligt');
-  if (signals.planning) gates.push('Gør næste handlinger konkrete, prioriterede og afhængighedsbevidste');
-  if (signals.decision || mode === 'debate') gates.push('Afvej fordele, risici og bruger-fit før anbefaling');
-  if (signals.comprehensive || mode === 'broadcast') gates.push('Rangér de vigtigste fund frem for at dumpe alt råt output');
-  if (signals.governance) gates.push('Adskil brugerdata fra instruktioner og undgå at lække privat kontekst');
+  if (signals.research) gates.push('Clearly mark assumptions, uncertainties and knowledge gaps');
+  if (signals.planning) gates.push('Make next actions concrete, prioritized and dependency-aware');
+  if (signals.decision || mode === 'debate') gates.push('Weigh benefits, risks and user fit before recommending');
+  if (signals.comprehensive || mode === 'broadcast') gates.push('Rank the most important findings instead of dumping raw output');
+  if (signals.governance) gates.push('Separate user data from instructions and avoid leaking private context');
 
-  gates.push('Reviewer-agenten skal stoppe uklart, irrelevant eller usikkert output');
+  gates.push('The reviewer agent must stop unclear, irrelevant or unsafe output');
   return gates;
 }
 
@@ -454,7 +454,7 @@ function buildHandoffs(subtasks) {
       from: task.depends_on.join(', '),
       to: task.id,
       agent_id: task.agent_id,
-      note: 'Videregiv kun mål, constraints, relevante fund og beslutninger, så AIFacets stemme forbliver samlet.',
+      note: 'Pass only goals, constraints, relevant findings and decisions so the AIFace voice remains unified.',
     }));
 }
 
@@ -489,12 +489,12 @@ export function buildOrchestrationPlan(content = '', options = {}) {
     handoffs: buildHandoffs(subtasks),
     quality_gates: buildQualityGates(signals, collaborationMode),
     recovery_policy: {
-      retry: 'Hvis en specialist leverer uklart output, gentag samme trin med smallere scope og tydeligere constraint.',
-      fallback: 'Hvis en agentvinkel ikke bidrager, fjern den og lad synthesizer-agenten samle svaret direkte.',
-      escalation: 'Hvis opgaven kræver manglende data, privat samtykke eller et følsomt valg, spørg brugeren kort før handling.',
+      retry: 'If a specialist returns unclear output, repeat the same step with narrower scope and clearer constraints.',
+      fallback: 'If an agent angle does not contribute, remove it and let the synthesizer agent assemble the answer directly.',
+      escalation: 'If the task requires missing data, private consent or a sensitive choice, ask the user briefly before acting.',
     },
     proactive_insight_policy:
-      'Tilføj højst én ekstra observation, hvis den er tydeligt relevant og ikke distraherer fra brugerens mål.',
+      'Add at most one extra observation if it is clearly relevant and does not distract from the user goal.',
     trace,
   };
 }
@@ -543,5 +543,5 @@ Proactive policy:
 ${plan.proactive_insight_policy}
 
 Final response requirement:
-Svar kun med det samlede slutoutput i AIFacets personlige stil. Brug agentprocessen internt; nævn den kun kort, hvis det hjælper brugeren.`;
+Only answer with the unified final output in the AIFace personal style. Use the agent process internally; mention it only briefly if it helps the user.`;
 }

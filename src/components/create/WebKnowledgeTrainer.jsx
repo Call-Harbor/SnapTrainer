@@ -46,11 +46,11 @@ export default function WebKnowledgeTrainer({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm">Web crawling & FAQ-træning</h3>
-              <Badge variant="outline" className="text-[10px]">for alle</Badge>
+              <h3 className="font-semibold text-sm">Web crawling & FAQ training</h3>
+              <Badge variant="outline" className="text-[10px]">for everyone</Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Tilføj URL'er, dokumentationssider, sitemap-regler og FAQ'er, så AIFacet kan bruge dem i sit knowledge sweep.
+              Add URLs, documentation pages, sitemap rules and FAQs, so the AIFace can use them in its knowledge sweep.
             </p>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function WebKnowledgeTrainer({
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium flex items-center gap-2">
             <Globe className="w-4 h-4 text-primary" />
-            URL'er til crawling
+            URLs to crawl
           </Label>
           <Button
             type="button"
@@ -71,13 +71,13 @@ export default function WebKnowledgeTrainer({
             onClick={() => onWebSourcesChange([...webSources, emptyWebSource])}
           >
             <Plus className="w-3.5 h-3.5" />
-            Tilføj URL
+            Add URL
           </Button>
         </div>
 
         {webSources.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border/60 p-4 text-center text-sm text-muted-foreground">
-            Ingen URL'er endnu. Tilføj en webside, docs-side, sitemap eller vidensbase.
+            No URLs yet. Add a website, docs page, sitemap or knowledge base.
           </div>
         ) : (
           <div className="space-y-3">
@@ -87,7 +87,7 @@ export default function WebKnowledgeTrainer({
                   <Input
                     value={source.url}
                     disabled={disabled}
-                    placeholder="https://example.com/docs eller https://example.com/sitemap.xml"
+                    placeholder="https://example.com/docs or https://example.com/sitemap.xml"
                     onChange={(e) => updateWebSource(index, 'url', e.target.value)}
                   />
                   <Button
@@ -122,7 +122,7 @@ export default function WebKnowledgeTrainer({
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Dybde</Label>
+                    <Label className="text-xs text-muted-foreground">Depth</Label>
                     <Select
                       value={source.crawl_depth}
                       disabled={disabled}
@@ -132,8 +132,8 @@ export default function WebKnowledgeTrainer({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="page">Kun denne side</SelectItem>
-                        <SelectItem value="section">Denne sektion</SelectItem>
+                        <SelectItem value="page">Only this page</SelectItem>
+                        <SelectItem value="section">This section</SelectItem>
                         <SelectItem value="site">Relevant site crawl</SelectItem>
                       </SelectContent>
                     </Select>
@@ -160,7 +160,7 @@ export default function WebKnowledgeTrainer({
                 <Input
                   value={source.notes}
                   disabled={disabled}
-                  placeholder="Hvad skal AIFacet især lære fra denne kilde?"
+                  placeholder="What should the AIFace learn from this source?"
                   onChange={(e) => updateWebSource(index, 'notes', e.target.value)}
                 />
               </div>
@@ -173,7 +173,7 @@ export default function WebKnowledgeTrainer({
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium flex items-center gap-2">
             <HelpCircle className="w-4 h-4 text-primary" />
-            FAQ-træning
+            FAQ training
           </Label>
           <Button
             type="button"
@@ -184,13 +184,13 @@ export default function WebKnowledgeTrainer({
             onClick={() => onFaqItemsChange([...faqItems, emptyFaq])}
           >
             <Plus className="w-3.5 h-3.5" />
-            Tilføj FAQ
+            Add FAQ
           </Button>
         </div>
 
         {faqItems.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border/60 p-4 text-center text-sm text-muted-foreground">
-            Ingen FAQ'er endnu. Tilføj spørgsmål/svar, så AIFacet lærer konkrete svarmønstre.
+            No FAQs yet. Add question/answer pairs so the AIFace learns concrete answer patterns.
           </div>
         ) : (
           <div className="space-y-3">
@@ -200,7 +200,7 @@ export default function WebKnowledgeTrainer({
                   <Input
                     value={faq.question}
                     disabled={disabled}
-                    placeholder="Spørgsmål"
+                    placeholder="Question"
                     onChange={(e) => updateFaq(index, 'question', e.target.value)}
                   />
                   <Button
@@ -216,7 +216,7 @@ export default function WebKnowledgeTrainer({
                 <Textarea
                   className="min-h-[84px] resize-y bg-secondary/20"
                   disabled={disabled}
-                  placeholder="Svar"
+                  placeholder="Answer"
                   value={faq.answer}
                   onChange={(e) => updateFaq(index, 'answer', e.target.value)}
                 />

@@ -170,7 +170,7 @@ export default function OrchestrationActivity({ plan, compact = false }) {
         <div className="mt-3 border-t border-border/50 pt-3 grid gap-1.5 text-[11px] text-muted-foreground">
           <p className="font-semibold text-foreground flex items-center gap-1.5">
             <RefreshCw className="w-3.5 h-3.5 text-primary" />
-            Retry, fallback og escalation
+            Retry, fallback and escalation
           </p>
           <p><span className="font-medium text-foreground">Retry:</span> {recoveryPolicy.retry}</p>
           <p><span className="font-medium text-foreground">Fallback:</span> {recoveryPolicy.fallback}</p>

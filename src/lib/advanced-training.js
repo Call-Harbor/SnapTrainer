@@ -26,12 +26,12 @@ export function summarizeAdvancedTrainingForPrompt(config = {}) {
   if (!training.enabled) return '';
 
   const parts = [
-    `Avanceret træning: ${training.mode}`,
-    training.training_objective && `Mål: ${training.training_objective}`,
+    `Advanced training: ${training.mode}`,
+    training.training_objective && `Goal: ${training.training_objective}`,
     training.preferred_collaboration_mode !== 'auto' &&
-      `Foretrukken orkestrering: ${training.preferred_collaboration_mode}`,
+      `Preferred orchestration: ${training.preferred_collaboration_mode}`,
     training.memory_policy && `Memory-policy: ${training.memory_policy}`,
-    training.context_strategy && `Context-strategi: ${training.context_strategy}`,
+    training.context_strategy && `Context strategy: ${training.context_strategy}`,
   ].filter(Boolean);
 
   return parts.join('\n');

@@ -52,8 +52,8 @@ export default function FileUploader({ files, onFilesChange, uploading }) {
           accept=".pdf,.txt,.md,.csv,.json,.html,.png,.jpg,.jpeg,.gif,.webp,.mp3,.wav,.ogg,.m4a"
         />
         <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-        <p className="text-sm font-medium">Træk filer hertil eller klik for at vælge</p>
-        <p className="text-xs text-muted-foreground mt-1">PDF, tekst, billeder, lyd, noter og mere</p>
+        <p className="text-sm font-medium">Drag files here or click to choose</p>
+        <p className="text-xs text-muted-foreground mt-1">PDF, text, images, audio, notes and more</p>
       </div>
 
       {files.length > 0 && (

@@ -76,7 +76,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
 
     doc.setFontSize(14);
     doc.setTextColor(160, 160, 220);
-    doc.text('Vidensrapport', 20, 62);
+    doc.text('Knowledge report', 20, 62);
 
     doc.setFontSize(22);
     doc.setTextColor(255, 255, 255);
@@ -85,12 +85,12 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
     doc.setFontSize(10);
     doc.setTextColor(130, 130, 180);
     doc.text(`Model: ${modelLabels[face.model] || face.model}`, 20, 113);
-    doc.text(`Genereret: ${format(new Date(), "d. MMMM yyyy 'kl.' HH:mm")}`, 20, 121);
+    doc.text(`Generated: ${format(new Date(), "d. MMMM yyyy 'at' HH:mm")}`, 20, 121);
 
     // Stats row
     const stats = [
-      { label: 'Beskeder', value: face.total_messages || 0 },
-      { label: 'Filer', value: face.total_files || 0 },
+      { label: 'Messages', value: face.total_messages || 0 },
+      { label: 'Files', value: face.total_files || 0 },
       { label: 'Feedbacks', value: feedbackEntries.length },
     ];
     stats.forEach((s, i) => {
@@ -110,7 +110,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(80, 80, 120);
-    doc.text('Eksporteret fra AIFaces-platformen', 20, 287);
+    doc.text('Exported from SnapTrainer', 20, 287);
 
     // ── PAGE 2: CONTENT ────────────────────────────────
     doc.addPage();
@@ -134,15 +134,15 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
     y += 10;
     y = drawDivider(doc, y);
 
-    // ── Identity / Stilpræferencer ──
+    // Identity / style preferences
     if (face.style_preferences && Object.keys(face.style_preferences).length > 0) {
-      y = drawSection(doc, 'Stilpræferencer', y);
+      y = drawSection(doc, 'Style preferences', y);
       const prefs = face.style_preferences;
       const rows = [
         ['Tone', prefs.tone || '—'],
-        ['Sprog', prefs.language || '—'],
-        ['Detaljering', prefs.verbosity || '—'],
-        ['Formalitet', prefs.formality || '—'],
+        ['Language', prefs.language || '-'],
+        ['Detail level', prefs.verbosity || '-'],
+        ['Formality', prefs.formality || '-'],
       ];
       rows.forEach(([key, val]) => {
         if (y > 270) { doc.addPage(); y = 20; }
@@ -159,9 +159,9 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
       y = drawDivider(doc, y);
     }
 
-    // ── Videns-resumé ──
+    // Knowledge summary
     if (face.knowledge_summary) {
-      y = drawSection(doc, 'Videns-resumé', y);
+      y = drawSection(doc, 'Knowledge summary', y);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.setTextColor(40, 40, 60);
@@ -170,12 +170,12 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
       y = drawDivider(doc, y);
     }
 
-    // ── Stilhints / Feedback ──
+    // Style hints / feedback
     const hints = feedbackEntries.filter(f => f.feedback_type === 'style_hint' && f.feedback_text);
     const thumbsUp = feedbackEntries.filter(f => f.feedback_type === 'thumbs_up').length;
     const thumbsDown = feedbackEntries.filter(f => f.feedback_type === 'thumbs_down').length;
 
-    y = drawSection(doc, 'Bruger-feedback & adaptation', y);
+    y = drawSection(doc, 'User feedback & adaptation', y);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60, 60, 80);
@@ -186,7 +186,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(60, 60, 80);
-      doc.text('Stilhints registreret:', margin, y);
+      doc.text('Registered style hints:', margin, y);
       y += 6;
       hints.forEach((hint) => {
         if (y > 270) { doc.addPage(); y = 20; }
@@ -205,16 +205,16 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
       doc.setFont('helvetica', 'italic');
       doc.setFontSize(9);
       doc.setTextColor(150, 150, 180);
-      doc.text('Ingen stilhints endnu.', margin, y);
+      doc.text('No style hints yet.', margin, y);
       y += 8;
     }
     y += 4;
 
-    // ── Uploadede filer ──
+    // Uploaded files
     if (includeFiles && knowledgeItems.length > 0) {
       if (y > 240) { doc.addPage(); y = 20; }
       y = drawDivider(doc, y);
-      y = drawSection(doc, `Vidensbase — ${knowledgeItems.length} fil${knowledgeItems.length !== 1 ? 'er' : ''}`, y);
+      y = drawSection(doc, `Knowledge base - ${knowledgeItems.length} file${knowledgeItems.length !== 1 ? 's' : ''}`, y);
 
       knowledgeItems.forEach((item, idx) => {
         if (y > 265) { doc.addPage(); y = 20; }
@@ -244,7 +244,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
         // Status
         const statusColor = item.status === 'ready' ? [34, 197, 94] : [245, 158, 11];
         doc.setTextColor(...statusColor);
-        doc.text(item.status === 'ready' ? 'Klar' : 'Behandles', margin + 163, y + 3);
+        doc.text(item.status === 'ready' ? 'Ready' : 'Processing', margin + 163, y + 3);
 
         // Summary if present
         if (item.extracted_summary) {
@@ -274,7 +274,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
       doc.setFontSize(7);
       doc.setTextColor(180, 180, 200);
       doc.text(`AIFaces · ${face.name}`, margin, 291);
-      doc.text(`Side ${i} af ${pageCount}`, 175, 291);
+      doc.text(`Page ${i} of ${pageCount}`, 175, 291);
     }
 
     return doc;
@@ -283,7 +283,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
   const handleExport = async (includeFiles) => {
     setLoading(true);
     const doc = buildPDF(includeFiles);
-    const fileName = `${face.name.replace(/\s+/g, '_')}_rapport_${format(new Date(), 'yyyyMMdd')}.pdf`;
+    const fileName = `${face.name.replace(/\s+/g, '_')}_report_${format(new Date(), 'yyyyMMdd')}.pdf`;
     doc.save(fileName);
     setLoading(false);
   };
@@ -295,7 +295,7 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
           {loading
             ? <Loader2 className="w-4 h-4 animate-spin" />
             : <Download className="w-4 h-4" />}
-          Eksporter PDF
+          Export PDF
           <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
@@ -303,8 +303,8 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
         <DropdownMenuItem onClick={() => handleExport(false)} className="gap-3 py-3 cursor-pointer">
           <Brain className="w-4 h-4 text-primary shrink-0" />
           <div>
-            <p className="text-sm font-medium">Kun videns-resumé</p>
-            <p className="text-xs text-muted-foreground">Resumé, stilpræferencer og feedback</p>
+            <p className="text-sm font-medium">Knowledge summary only</p>
+            <p className="text-xs text-muted-foreground">Summary, style preferences and feedback</p>
           </div>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -315,11 +315,11 @@ export default function ExportPDFButton({ face, knowledgeItems, feedbackEntries 
         >
           <FileText className="w-4 h-4 text-primary shrink-0" />
           <div>
-            <p className="text-sm font-medium">Fuld rapport inkl. filer</p>
+            <p className="text-sm font-medium">Full report incl. files</p>
             <p className="text-xs text-muted-foreground">
               {knowledgeItems.length > 0
-                ? `Inkl. ${knowledgeItems.length} fil${knowledgeItems.length !== 1 ? 'er' : ''} fra vidensbasen`
-                : 'Ingen filer uploadet endnu'}
+                ? `Incl. ${knowledgeItems.length} file${knowledgeItems.length !== 1 ? 's' : ''} from the knowledge base`
+                : 'No files uploaded yet'}
             </p>
           </div>
         </DropdownMenuItem>

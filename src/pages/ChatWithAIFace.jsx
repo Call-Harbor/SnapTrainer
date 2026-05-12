@@ -68,7 +68,7 @@ export default function ChatWithAIFace() {
         ...s,
         messages: s.messages.sort((a, b) => new Date(a.created_date) - new Date(b.created_date)),
         messageCount: s.messages.length,
-        preview: s.messages.find(m => m.role === 'user')?.content?.slice(0, 60) || 'Tom samtale',
+        preview: s.messages.find(m => m.role === 'user')?.content?.slice(0, 60) || 'Empty conversation',
       }))
       .sort((a, b) => new Date(b.lastDate) - new Date(a.lastDate));
   }, [allMessages]);
@@ -90,24 +90,24 @@ export default function ChatWithAIFace() {
 
   const buildSystemPrompt = () => {
     const parts = [
-      `Du er et personligt AIFace ved navn "${face?.name}" i SnapTrainer. Du er brugerens samlede AI-identitet.`,
+      `You are a personal AIFace named "${face?.name}" in SnapTrainer. You are the user's unified AI identity.`,
     ];
-    if (face?.role) parts.push(`Din rolle: ${face.role}`);
-    if (face?.identity_prompt) parts.push(`Brugerens præferencer:\n${face.identity_prompt}`);
-    if (face?.knowledge_summary) parts.push(`Hvad du har lært om brugeren:\n${face.knowledge_summary}`);
+    if (face?.role) parts.push(`Your role: ${face.role}`);
+    if (face?.identity_prompt) parts.push(`User preferences:\n${face.identity_prompt}`);
+    if (face?.knowledge_summary) parts.push(`What you have learned about the user:\n${face.knowledge_summary}`);
     const advancedTrainingPrompt = formatAdvancedTrainingForPrompt(face?.advanced_training);
     if (advancedTrainingPrompt) parts.push(advancedTrainingPrompt);
 
     const styleHints = feedbackEntries
       .filter(f => f.feedback_type === 'style_hint' && f.feedback_text)
       .map(f => f.feedback_text);
-    if (styleHints.length > 0) parts.push(`Stilhints fra brugeren:\n- ${styleHints.join('\n- ')}`);
+    if (styleHints.length > 0) parts.push(`Style hints from the user:\n- ${styleHints.join('\n- ')}`);
 
     const summaries = knowledgeItems
       .filter(k => k.extracted_summary || k.training_text)
       .map(k => k.extracted_summary || k.training_text);
     if (summaries.length > 0) {
-      parts.push(`Kontekst fra brugerens videnkilder, filer, URL-crawl instruktioner og FAQ-træning:\n${summaries.join('\n\n')}`);
+      parts.push(`Context from the user's knowledge sources, files, URL crawl instructions and FAQ training:\n${summaries.join('\n\n')}`);
     }
 
     return parts.join('\n\n');
@@ -136,7 +136,7 @@ export default function ChatWithAIFace() {
     const historyForContext = sessionMessages.map(m => `${m.role}: ${m.content}`).join('\n');
     const systemPrompt = buildSystemPrompt();
     const orchestrationPrompt = buildOrchestrationPrompt(orchestrationPlan);
-    const fullPrompt = `${systemPrompt}\n\n${orchestrationPrompt}\n\nFuldstændig samtalehistorik for denne session:\n${historyForContext}\nuser: ${content}\n\nSvar som AI-agenten:`;
+    const fullPrompt = `${systemPrompt}\n\n${orchestrationPrompt}\n\nFull conversation history for this session:\n${historyForContext}\nuser: ${content}\n\nAnswer as the AI agent:`;
 
     const response = await base44.integrations.Core.InvokeLLM({
       prompt: fullPrompt,
@@ -185,8 +185,8 @@ export default function ChatWithAIFace() {
   if (!face) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <p className="text-muted-foreground">AIFace ikke fundet</p>
-        <Link to="/"><Button variant="outline">Tilbage til dashboard</Button></Link>
+        <p className="text-muted-foreground">AIFace not found</p>
+        <Link to="/"><Button variant="outline">Back to dashboard</Button></Link>
       </div>
     );
   }
@@ -235,7 +235,7 @@ export default function ChatWithAIFace() {
             <div>
               <h2 className="font-semibold text-sm">{face.name}</h2>
               <p className="text-[11px] text-muted-foreground leading-tight">
-                {face.status === 'ready' ? 'Online' : 'Træner...'} · {sessions.length} samtale{sessions.length !== 1 ? 'r' : ''}
+                {face.status === 'ready' ? 'Online' : 'Training...'} · {sessions.length} conversation{sessions.length !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
@@ -253,9 +253,9 @@ export default function ChatWithAIFace() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4">
                 <Sparkles className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg mb-1">Ny samtale</h3>
+              <h3 className="font-semibold text-lg mb-1">New conversation</h3>
               <p className="text-sm text-muted-foreground max-w-md">
-                Skriv til {face.name}. Dit AIFace svarer som én personlig AI, mens SnapTrainer kan route større opgaver gennem specialistagenter.
+                Write to {face.name}. Your AIFace answers as one personal AI while SnapTrainer can route larger tasks through specialist agents.
               </p>
             </div>
           )}
@@ -281,7 +281,7 @@ export default function ChatWithAIFace() {
                     <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
-                  <span className="text-xs text-muted-foreground">Tænker...</span>
+                  <span className="text-xs text-muted-foreground">Thinking...</span>
                 </div>
                 {activePlan && <OrchestrationActivity plan={activePlan} compact />}
               </div>

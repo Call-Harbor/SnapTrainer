@@ -28,7 +28,7 @@ export default function FeedbackBar({ messageId, aifaceId }) {
         {submitted === 'thumbs_up' && <ThumbsUp className="w-3 h-3 text-emerald-500" />}
         {submitted === 'thumbs_down' && <ThumbsDown className="w-3 h-3 text-destructive" />}
         {(submitted === 'correction' || submitted === 'style_hint') && <MessageSquare className="w-3 h-3 text-primary" />}
-        <span>Feedback modtaget</span>
+        <span>Feedback received</span>
       </div>
     );
   }
@@ -59,14 +59,14 @@ export default function FeedbackBar({ messageId, aifaceId }) {
           onClick={() => setShowInput(!showInput)}
         >
           <MessageSquare className="w-3.5 h-3.5" />
-          Ret
+          Adjust
         </Button>
       </div>
 
       {showInput && (
         <div className="flex items-center gap-2">
           <Input
-            placeholder="F.eks. 'kortere', 'mere dansk', 'mere teknisk'..."
+            placeholder="E.g. 'shorter', 'more English', 'more technical'..."
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="h-8 text-sm"
