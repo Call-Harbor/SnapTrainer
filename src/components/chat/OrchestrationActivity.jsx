@@ -146,7 +146,7 @@ export default function OrchestrationActivity({ plan, compact = false }) {
             {handoffs.slice(0, 6).map((handoff) => (
               <div key={`${handoff.from}-${handoff.to}`} className="text-[11px] text-muted-foreground">
                 <span className="font-medium text-foreground">{handoff.from}</span>
-                <span> -> </span>
+                <span>{' -> '}</span>
                 <span className="font-medium text-foreground">{handoff.to}</span>
                 <p className="leading-snug">{handoff.note}</p>
               </div>
