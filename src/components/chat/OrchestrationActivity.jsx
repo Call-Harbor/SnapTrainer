@@ -1,6 +1,18 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Brain, CheckCircle2, GitBranch, PenLine, Search, ShieldCheck, Workflow } from 'lucide-react';
+import {
+  AlertTriangle,
+  Brain,
+  CheckCircle2,
+  GitBranch,
+  Layers,
+  PenLine,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  Workflow,
+  Zap,
+} from 'lucide-react';
 
 const icons = {
   orchestrator: Workflow,
@@ -10,10 +22,16 @@ const icons = {
   writer: PenLine,
   organizer: GitBranch,
   reviewer: ShieldCheck,
+  memory: Layers,
+  guardrail: AlertTriangle,
+  executor: Zap,
 };
 
 export default function OrchestrationActivity({ plan, compact = false }) {
   const trace = plan?.trace || plan?.agent_trace || [];
+  const subtasks = plan?.subtasks || [];
+  const qualityGates = plan?.quality_gates || [];
+  const recoveryPolicy = plan?.recovery_policy;
   if (trace.length === 0) return null;
 
   return (
@@ -25,10 +43,24 @@ export default function OrchestrationActivity({ plan, compact = false }) {
             <p className="text-[11px] text-muted-foreground mt-0.5">{plan.summary}</p>
           )}
         </div>
-        <Badge variant="outline" className="text-[10px]">
-          {trace.length} trin
-        </Badge>
+        <div className="flex items-center gap-1.5">
+          {plan?.execution_mode && (
+            <Badge variant="outline" className="text-[10px]">
+              {plan.execution_mode}
+            </Badge>
+          )}
+          <Badge variant="outline" className="text-[10px]">
+            {trace.length} agenter
+          </Badge>
+        </div>
       </div>
+      {plan?.workflow_type && !compact && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg bg-background/70 px-2.5 py-2 text-[11px] text-muted-foreground">
+          <Workflow className="w-3.5 h-3.5 text-primary" />
+          <span className="font-medium text-foreground">Workflow:</span>
+          <span>{plan.workflow_type}</span>
+        </div>
+      )}
       <div className="grid gap-2">
         {trace.map((step) => {
           const Icon = icons[step.agent_id] || Workflow;
@@ -41,15 +73,61 @@ export default function OrchestrationActivity({ plan, compact = false }) {
                 <div className="flex items-center gap-1.5">
                   <span className="font-medium">{step.agent_name}</span>
                   <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                  {step.execution === 'parallel' && (
+                    <Badge variant="outline" className="text-[9px] px-1 py-0">parallel</Badge>
+                  )}
                 </div>
                 {!compact && (
-                  <p className="text-muted-foreground leading-snug">{step.description}</p>
+                  <p className="text-muted-foreground leading-snug">
+                    {step.output || step.description}
+                  </p>
                 )}
               </div>
             </div>
           );
         })}
       </div>
+      {!compact && subtasks.length > 0 && (
+        <div className="mt-3 border-t border-border/50 pt-3">
+          <p className="text-[11px] font-semibold mb-2">Task decomposition</p>
+          <div className="grid gap-1.5">
+            {subtasks.map((task, index) => (
+              <div key={task.id} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <span className="w-5 h-5 rounded-md bg-background border border-border/60 flex items-center justify-center text-[10px] text-foreground">
+                  {index + 1}
+                </span>
+                <span className="flex-1">{task.title}</span>
+                <Badge variant="outline" className="text-[9px] px-1 py-0">
+                  {task.execution}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {!compact && qualityGates.length > 0 && (
+        <div className="mt-3 border-t border-border/50 pt-3">
+          <p className="text-[11px] font-semibold mb-2">Quality gates</p>
+          <div className="flex flex-wrap gap-1.5">
+            {qualityGates.map((gate) => (
+              <Badge key={gate} variant="outline" className="text-[10px] font-normal">
+                {gate}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+      {!compact && recoveryPolicy && (
+        <div className="mt-3 border-t border-border/50 pt-3 grid gap-1.5 text-[11px] text-muted-foreground">
+          <p className="font-semibold text-foreground flex items-center gap-1.5">
+            <RefreshCw className="w-3.5 h-3.5 text-primary" />
+            Retry, fallback og escalation
+          </p>
+          <p><span className="font-medium text-foreground">Retry:</span> {recoveryPolicy.retry}</p>
+          <p><span className="font-medium text-foreground">Fallback:</span> {recoveryPolicy.fallback}</p>
+          <p><span className="font-medium text-foreground">Escalation:</span> {recoveryPolicy.escalation}</p>
+        </div>
+      )}
     </div>
   );
 }

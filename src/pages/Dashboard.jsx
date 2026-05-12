@@ -80,12 +80,12 @@ export default function Dashboard() {
           {
             icon: GitBranch,
             title: 'Orkestrering',
-            text: 'Komplekse prompts kan opdeles og routes gennem planner-, research-, writer- og reviewer-agenter.',
+            text: 'Komplekse prompts opdeles, routes og kan køre i sekventielle eller parallelle specialist-lanes.',
           },
           {
             icon: ShieldCheck,
             title: 'Synlig kontrol',
-            text: 'Du kan se profil, viden, feedback og hvilke agenttrin der blev brugt i svaret.',
+            text: 'Du kan se profil, viden, feedback, agenttrin, quality gates og fallback-logik.',
           },
         ].map((item) => (
           <Card key={item.title} className="p-4 border-border/50">

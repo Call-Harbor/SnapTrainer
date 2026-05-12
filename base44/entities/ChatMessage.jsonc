@@ -32,6 +32,19 @@
       "type": "string",
       "description": "Short user-facing summary of the orchestration flow"
     },
+    "workflow_type": {
+      "type": "string",
+      "description": "High-level workflow selected by the orchestrator"
+    },
+    "execution_mode": {
+      "type": "string",
+      "enum": [
+        "sequential",
+        "parallel",
+        "hybrid"
+      ],
+      "description": "Whether subtasks were planned as sequential, parallel, or hybrid work"
+    },
     "agent_trace": {
       "type": "array",
       "description": "Visible activity steps for the specialist agents used to answer",
@@ -47,9 +60,79 @@
           "status": {
             "type": "string"
           },
+          "phase": {
+            "type": "string"
+          },
+          "lane": {
+            "type": "string"
+          },
+          "execution": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "capability": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
           "description": {
             "type": "string"
           }
+        }
+      }
+    },
+    "subtasks": {
+      "type": "array",
+      "description": "Task decomposition created for the response",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "agent_id": {
+            "type": "string"
+          },
+          "execution": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "quality_gates": {
+      "type": "array",
+      "description": "Verification criteria applied before sending the response",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recovery_policy": {
+      "type": "object",
+      "description": "Retry, fallback and escalation rules used by the orchestration layer",
+      "properties": {
+        "retry": {
+          "type": "string"
+        },
+        "fallback": {
+          "type": "string"
+        },
+        "escalation": {
+          "type": "string"
         }
       }
     }

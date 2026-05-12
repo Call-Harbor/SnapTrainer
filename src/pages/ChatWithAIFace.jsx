@@ -108,7 +108,10 @@ export default function ChatWithAIFace() {
 
   const handleSend = async (content) => {
     setSending(true);
-    const orchestrationPlan = buildOrchestrationPlan(content);
+    const orchestrationPlan = buildOrchestrationPlan(content, {
+      hasKnowledge: knowledgeItems.length > 0 || Boolean(face?.knowledge_summary),
+      hasFeedback: feedbackEntries.length > 0,
+    });
     setActivePlan(orchestrationPlan);
 
     await base44.entities.ChatMessage.create({
@@ -138,7 +141,12 @@ export default function ChatWithAIFace() {
       session_id: activeSessionId,
       orchestration_mode: orchestrationPlan.mode,
       orchestration_summary: orchestrationPlan.summary,
+      workflow_type: orchestrationPlan.workflow_type,
+      execution_mode: orchestrationPlan.execution_mode,
       agent_trace: orchestrationPlan.trace,
+      subtasks: orchestrationPlan.subtasks,
+      quality_gates: orchestrationPlan.quality_gates,
+      recovery_policy: orchestrationPlan.recovery_policy,
     });
 
     await base44.entities.AIFace.update(id, {
