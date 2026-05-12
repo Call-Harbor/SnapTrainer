@@ -238,7 +238,7 @@ export default function AIFaceProfile() {
 
   const handleDelete = async () => {
     await base44.entities.AIFace.delete(id);
-    navigate('/');
+    navigate('/app');
   };
 
   if (isLoading || !face) {

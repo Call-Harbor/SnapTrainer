@@ -181,7 +181,7 @@ export default function ChatWithAIFace() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
         <p className="text-muted-foreground">AIFace not found</p>
-        <Link to="/"><Button variant="outline">Back to dashboard</Button></Link>
+        <Link to="/app"><Button variant="outline">Back to dashboard</Button></Link>
       </div>
     );
   }
@@ -219,7 +219,7 @@ export default function ChatWithAIFace() {
             >
               <PanelLeft className="w-4 h-4" />
             </Button>
-            <Link to="/">
+            <Link to="/app">
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <ArrowLeft className="w-4 h-4" />
               </Button>

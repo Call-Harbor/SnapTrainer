@@ -156,7 +156,7 @@ Write a short summary (2-3 sentences) of what this AI agent has learned about th
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Button variant="ghost" className="gap-2 mb-6 text-muted-foreground" onClick={() => navigate('/')}>
+      <Button variant="ghost" className="gap-2 mb-6 text-muted-foreground" onClick={() => navigate('/app')}>
         <ArrowLeft className="w-4 h-4" /> Back
       </Button>
 
