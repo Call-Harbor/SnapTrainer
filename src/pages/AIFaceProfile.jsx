@@ -46,23 +46,23 @@ const fileTypeIcons = {
 
 const roles = [
   'Business advisor',
-  'Studiemakker',
+  'Study partner',
   'Planner',
   'Creative partner',
   'Support specialist',
-  'Personlig assistent',
+  'Personal assistant',
 ];
 
 const specialistAgents = [
-  { name: 'Orchestrator', icon: Workflow, text: 'Vælger workflow, execution mode og hvilke agenter der skal aktiveres.' },
-  { name: 'Memory', icon: Brain, text: 'Henter relevant profil, feedback, filer og samtalehistorik.' },
-  { name: 'Planner', icon: GitBranch, text: 'Omsætter mål til delopgaver, rækkefølge og næste skridt.' },
-  { name: 'Research', icon: Search, text: 'Finder relevante vinkler og vidensbehov i konteksten.' },
-  { name: 'Analyst', icon: Brain, text: 'Prioriterer indsigter og beslutningspunkter.' },
-  { name: 'Writer', icon: PenLine, text: 'Former svaret i AIFacets tone og sprog.' },
-  { name: 'Organizer', icon: GitBranch, text: 'Gør output handlingsklart med struktur og opfølgning.' },
-  { name: 'Reviewer', icon: ShieldCheck, text: 'Tjekker output for klarhed, relevans og mangler.' },
-  { name: 'Guardrail', icon: ShieldCheck, text: 'Markerer datagrænser, usikkerhed og behov for afklaring.' },
+  { name: 'Orchestrator', icon: Workflow, text: 'Selects workflow, execution mode and which agents should activate.' },
+  { name: 'Memory', icon: Brain, text: 'Retrieves relevant profile, feedback, files and conversation history.' },
+  { name: 'Planner', icon: GitBranch, text: 'Turns goals into subtasks, order and next actions.' },
+  { name: 'Research', icon: Search, text: 'Finds relevant angles and knowledge needs in context.' },
+  { name: 'Analyst', icon: Brain, text: 'Prioritizes insights and decision points.' },
+  { name: 'Writer', icon: PenLine, text: 'Shapes the answer in the AIFace tone and language.' },
+  { name: 'Organizer', icon: GitBranch, text: 'Makes output actionable with structure and follow-up.' },
+  { name: 'Reviewer', icon: ShieldCheck, text: 'Checks output for clarity, relevance and gaps.' },
+  { name: 'Guardrail', icon: ShieldCheck, text: 'Flags data boundaries, uncertainty and clarification needs.' },
 ];
 
 const orchestrationFeatures = [
@@ -81,12 +81,12 @@ const orchestrationFeatures = [
 ];
 
 const collaborationModes = [
-  { label: 'Auto-routing', text: 'Vælger automatisk de relevante specialistagenter.' },
-  { label: 'Parallel', text: 'Kører uafhængige perspektiver samtidigt og syntetiserer dem.' },
-  { label: 'Sequential', text: 'Sender output fra ét trin videre som kontekst til det næste.' },
-  { label: 'Debate', text: 'Afvejer modsatrettede ekspertvinkler før anbefaling.' },
-  { label: 'Hierarchical', text: 'Supervisor opdeler komplekse mål og aggregerer resultater.' },
-  { label: 'Broadcast', text: 'Scanner bredt for maksimal dækning og færre blinde vinkler.' },
+  { label: 'Auto-routing', text: 'Automatically selects the relevant specialist agents.' },
+  { label: 'Parallel', text: 'Runs independent perspectives at the same time and synthesizes them.' },
+  { label: 'Sequential', text: 'Passes output from one step as context to the next.' },
+  { label: 'Debate', text: 'Balances opposing expert viewpoints before recommending.' },
+  { label: 'Hierarchical', text: 'A supervisor decomposes complex goals and aggregates results.' },
+  { label: 'Broadcast', text: 'Scans broadly for maximum coverage and fewer blind spots.' },
 ];
 
 export default function AIFaceProfile() {
@@ -128,7 +128,7 @@ export default function AIFaceProfile() {
     if (face && !preferences) {
       setPreferences(face.style_preferences || {});
       setModel(face.model);
-      setRole(face.role || face.style_preferences?.role || 'Personlig assistent');
+      setRole(face.role || face.style_preferences?.role || 'Personal assistant');
       setAdvancedTraining(normalizeAdvancedTrainingConfig(face.advanced_training));
     }
   }, [face]);
@@ -138,10 +138,10 @@ export default function AIFaceProfile() {
 
     let identityParts = [];
     if (preferences?.tone) identityParts.push(`Tone: ${preferences.tone}`);
-    if (preferences?.language) identityParts.push(`Sprog: ${preferences.language}`);
-    if (role) identityParts.push(`Rolle: ${role}`);
-    if (preferences?.verbosity) identityParts.push(`Detaljering: ${preferences.verbosity}`);
-    if (preferences?.formality) identityParts.push(`Formalitet: ${preferences.formality}`);
+    if (preferences?.language) identityParts.push(`Language: ${preferences.language}`);
+    if (role) identityParts.push(`Role: ${role}`);
+    if (preferences?.verbosity) identityParts.push(`Detail level: ${preferences.verbosity}`);
+    if (preferences?.formality) identityParts.push(`Formality: ${preferences.formality}`);
     const advancedTrainingSummary = summarizeAdvancedTrainingForPrompt(advancedTraining);
     if (advancedTrainingSummary) identityParts.push(advancedTrainingSummary);
 
@@ -268,7 +268,7 @@ export default function AIFaceProfile() {
             </div>
             <div>
               <h1 className="text-xl font-bold">{face.name}</h1>
-              <p className="text-sm text-muted-foreground">{face.role || 'Personlig AI-identitet'} · Profil & indstillinger</p>
+              <p className="text-sm text-muted-foreground">{face.role || 'Personal AI identity'} · Profile & settings</p>
             </div>
           </div>
         </div>
@@ -287,15 +287,15 @@ export default function AIFaceProfile() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Slet AIFace?</AlertDialogTitle>
+              <AlertDialogTitle>Delete AIFace?</AlertDialogTitle>
               <AlertDialogDescription>
-                Dette sletter "{face.name}" og al tilhørende data permanent.
+                This permanently deletes "{face.name}" and all related data.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Annuller</AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-                Slet
+                Delete
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -308,12 +308,12 @@ export default function AIFaceProfile() {
         <Card className="p-4 text-center">
           <MessageSquare className="w-5 h-5 text-primary mx-auto mb-2" />
           <p className="text-2xl font-bold">{face.total_messages || 0}</p>
-          <p className="text-xs text-muted-foreground">Beskeder</p>
+          <p className="text-xs text-muted-foreground">Messages</p>
         </Card>
         <Card className="p-4 text-center">
           <FileText className="w-5 h-5 text-primary mx-auto mb-2" />
           <p className="text-2xl font-bold">{face.total_files || 0}</p>
-          <p className="text-xs text-muted-foreground">Filer</p>
+          <p className="text-xs text-muted-foreground">Files</p>
         </Card>
         <Card className="p-4 text-center">
           <Brain className="w-5 h-5 text-primary mx-auto mb-2" />
@@ -328,7 +328,7 @@ export default function AIFaceProfile() {
             <div className="flex items-start gap-3">
               <Brain className="w-5 h-5 text-primary shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium mb-1">Hvad din AI har lært</p>
+                <p className="text-sm font-medium mb-1">What your AI has learned</p>
                 <p className="text-sm text-muted-foreground">{face.knowledge_summary}</p>
               </div>
             </div>
@@ -339,16 +339,16 @@ export default function AIFaceProfile() {
       <Tabs defaultValue="settings" className="space-y-6">
         <TabsList className="grid grid-cols-5">
           <TabsTrigger value="settings" className="gap-1.5">
-            <Settings className="w-3.5 h-3.5" /> Indstillinger
+            <Settings className="w-3.5 h-3.5" /> Settings
           </TabsTrigger>
           <TabsTrigger value="knowledge" className="gap-1.5">
-            <FileText className="w-3.5 h-3.5" /> Viden
+            <FileText className="w-3.5 h-3.5" /> Knowledge
           </TabsTrigger>
           <TabsTrigger value="orchestration" className="gap-1.5">
-            <Workflow className="w-3.5 h-3.5" /> Orkestrering
+            <Workflow className="w-3.5 h-3.5" /> Orchestration
           </TabsTrigger>
           <TabsTrigger value="training" className="gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" /> Træning
+            <Sparkles className="w-3.5 h-3.5" /> Training
           </TabsTrigger>
           <TabsTrigger value="feedback" className="gap-1.5">
             <Brain className="w-3.5 h-3.5" /> Adaptation
@@ -358,7 +358,7 @@ export default function AIFaceProfile() {
         <TabsContent value="settings" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">AIFace-rolle</CardTitle>
+              <CardTitle className="text-base">AIFace role</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -381,7 +381,7 @@ export default function AIFaceProfile() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">AI-model</CardTitle>
+              <CardTitle className="text-base">AI model</CardTitle>
             </CardHeader>
             <CardContent>
               {model && <ModelSelector selected={model} onSelect={setModel} />}
@@ -389,7 +389,7 @@ export default function AIFaceProfile() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Stilpræferencer</CardTitle>
+              <CardTitle className="text-base">Style preferences</CardTitle>
             </CardHeader>
             <CardContent>
               {preferences && <StylePreferences preferences={preferences} onChange={setPreferences} />}
@@ -397,18 +397,18 @@ export default function AIFaceProfile() {
           </Card>
           <Button onClick={handleSave} disabled={saving} className="gap-2 shadow-lg shadow-primary/20">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            Gem ændringer
+            Save changes
           </Button>
         </TabsContent>
 
         <TabsContent value="knowledge" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Uploadede filer</CardTitle>
+              <CardTitle className="text-base">Uploaded files</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {knowledgeItems.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">Ingen filer endnu</p>
+                <p className="text-sm text-muted-foreground py-4 text-center">No files yet</p>
               ) : (
                 knowledgeItems.map((item) => {
                   const Icon = fileTypeIcons[item.file_type] || FileText;
@@ -428,7 +428,7 @@ export default function AIFaceProfile() {
                         item.status === 'processing' ? 'text-amber-600 border-amber-200' :
                         'text-destructive border-destructive/20'
                       }>
-                        {item.status === 'ready' ? 'Klar' : item.status === 'processing' ? 'Behandles' : 'Fejl'}
+                        {item.status === 'ready' ? 'Ready' : item.status === 'processing' ? 'Processing' : 'Failed'}
                       </Badge>
                     </div>
                   );
@@ -440,7 +440,7 @@ export default function AIFaceProfile() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Upload className="w-4 h-4" /> Upload flere filer
+                <Upload className="w-4 h-4" /> Upload more files
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -448,7 +448,7 @@ export default function AIFaceProfile() {
               {newFiles.length > 0 && (
                 <Button onClick={handleUploadMore} disabled={uploading} className="gap-2">
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  Upload {newFiles.length} fil{newFiles.length !== 1 ? 'er' : ''}
+                  Upload {newFiles.length} file{newFiles.length !== 1 ? 's' : ''}
                 </Button>
               )}
             </CardContent>
@@ -457,7 +457,7 @@ export default function AIFaceProfile() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Globe className="w-4 h-4" /> Træn med URL'er og FAQ'er
+                <Globe className="w-4 h-4" /> Train with URLs and FAQs
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -471,7 +471,7 @@ export default function AIFaceProfile() {
               {(getValidWebSources(newWebSources).length > 0 || getValidFaqItems(newFaqItems).length > 0) && (
                 <Button onClick={handleAddWebKnowledge} disabled={uploading} className="gap-2">
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
-                  Gem web/FAQ-træning
+                  Save web/FAQ training
                 </Button>
               )}
             </CardContent>
@@ -495,7 +495,7 @@ export default function AIFaceProfile() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                {face.name} er den eneste brugerflade, men SnapTrainer fortolker mål, vælger collaboration mode, fordeler arbejdet, overfører kontekst og samler ét konsistent svar.
+                {face.name} is the only user-facing surface, while SnapTrainer interprets goals, selects collaboration mode, distributes work, hands off context and returns one consistent answer.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {collaborationModes.map((mode) => (
@@ -514,7 +514,7 @@ export default function AIFaceProfile() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium">{agent.name}</p>
-                        <Badge variant="outline" className="text-[10px]">aktiv ved behov</Badge>
+                        <Badge variant="outline" className="text-[10px]">active when needed</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{agent.text}</p>
                     </div>
@@ -529,7 +529,7 @@ export default function AIFaceProfile() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="w-4 h-4" /> Avanceret træning
+                <Sparkles className="w-4 h-4" /> Advanced training
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -538,7 +538,7 @@ export default function AIFaceProfile() {
           </Card>
           <Button onClick={handleSave} disabled={saving} className="gap-2 shadow-lg shadow-primary/20">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            Gem træning
+            Save training
           </Button>
         </TabsContent>
 
@@ -563,7 +563,7 @@ export default function AIFaceProfile() {
           {hints.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Stilhints fra dig</CardTitle>
+                <CardTitle className="text-base">Style hints from you</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {hints.map((hint) => (
@@ -582,7 +582,7 @@ export default function AIFaceProfile() {
           {hints.length === 0 && thumbsUp === 0 && thumbsDown === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <Brain className="w-8 h-8 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Ingen feedback endnu. Chat med dit AIFace og giv feedback for at gøre det mere personligt.</p>
+              <p className="text-sm">No feedback yet. Chat with your AIFace and give feedback to make it more personal.</p>
             </div>
           )}
         </TabsContent>

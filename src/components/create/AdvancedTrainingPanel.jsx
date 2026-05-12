@@ -31,7 +31,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
                 <Badge variant="outline" className="text-[10px]">AI/ML</Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Aktiver ekspertstyring af instruktioner, output-kontrakter, eval-kriterier, memory og agent-routing.
+                Enable expert control over instructions, output contracts, eval criteria, memory and agent routing.
               </p>
             </div>
           </div>
@@ -43,7 +43,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Træningsprofil</Label>
+              <Label className="text-sm font-medium">Training profile</Label>
               <Select value={config.mode} onValueChange={(v) => update('mode', v)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -57,7 +57,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Foretrukken orkestrering</Label>
+              <Label className="text-sm font-medium">Preferred orchestration</Label>
               <Select
                 value={config.preferred_collaboration_mode}
                 onValueChange={(v) => update('preferred_collaboration_mode', v)}
@@ -80,7 +80,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
           <div className="space-y-2">
             <Label className="text-sm font-medium">Training objective</Label>
             <Input
-              placeholder="F.eks. 'Svar som en senior ML engineer med fokus på evals, tradeoffs og produktionsrisiko.'"
+              placeholder="E.g. 'Answer like a senior ML engineer focused on evals, tradeoffs and production risk.'"
               value={config.training_objective}
               onChange={(e) => update('training_objective', e.target.value)}
             />
@@ -94,7 +94,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
               </Label>
               <Textarea
                 className={fieldClassName}
-                placeholder="Ekspertinstruktioner, ræsonneringsstil, antagelsespolitik, domænegrænser..."
+                placeholder="Expert instructions, reasoning style, assumption policy, domain boundaries..."
                 value={config.system_directives}
                 onChange={(e) => update('system_directives', e.target.value)}
               />
@@ -104,7 +104,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
               <Label className="text-sm font-medium">Output contract</Label>
               <Textarea
                 className={fieldClassName}
-                placeholder="Formatkrav, sektioner, JSON/Markdown-kontrakt, beslutningsstruktur..."
+                placeholder="Format requirements, sections, JSON/Markdown contract, decision structure..."
                 value={config.output_contract}
                 onChange={(e) => update('output_contract', e.target.value)}
               />
@@ -117,7 +117,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
               </Label>
               <Textarea
                 className={fieldClassName}
-                placeholder="Hvad AIFacet ikke må gøre: ingen hallucinerede kilder, ingen skjulte antagelser..."
+                placeholder="What the AIFace must not do: no hallucinated sources, no hidden assumptions..."
                 value={config.negative_constraints}
                 onChange={(e) => update('negative_constraints', e.target.value)}
               />
@@ -127,7 +127,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
               <Label className="text-sm font-medium">Evaluation criteria</Label>
               <Textarea
                 className={fieldClassName}
-                placeholder="Kriterier for godt output: korrekthed, calibration, edge cases, testbarhed..."
+                placeholder="Criteria for good output: correctness, calibration, edge cases, testability..."
                 value={config.evaluation_criteria}
                 onChange={(e) => update('evaluation_criteria', e.target.value)}
               />
@@ -138,7 +138,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
             <Label className="text-sm font-medium">Few-shot examples</Label>
             <Textarea
               className="min-h-[110px] resize-y bg-secondary/20"
-              placeholder="Indsæt eksempler på input -> godt output, dårligt output -> rettelse, eller eval cases."
+              placeholder="Add examples of input -> good output, bad output -> correction, or eval cases."
               value={config.few_shot_examples}
               onChange={(e) => update('few_shot_examples', e.target.value)}
             />
@@ -195,7 +195,7 @@ export default function AdvancedTrainingPanel({ value, onChange }) {
             </Label>
             <Textarea
               className={fieldClassName}
-              placeholder="Regler for hvornår research, debate, reviewer, guardrail eller broadcast skal bruges."
+              placeholder="Rules for when research, debate, reviewer, guardrail or broadcast should be used."
               value={config.specialist_routing_notes}
               onChange={(e) => update('specialist_routing_notes', e.target.value)}
             />

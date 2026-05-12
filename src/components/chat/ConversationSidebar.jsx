@@ -7,13 +7,13 @@ import { format, isToday, isYesterday, isThisWeek } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 function groupSessions(sessions) {
-  const groups = { 'I dag': [], 'I går': [], 'Denne uge': [], 'Tidligere': [] };
+  const groups = { Today: [], Yesterday: [], 'This week': [], Earlier: [] };
   sessions.forEach((s) => {
     const d = new Date(s.lastDate);
-    if (isToday(d)) groups['I dag'].push(s);
-    else if (isYesterday(d)) groups['I går'].push(s);
-    else if (isThisWeek(d)) groups['Denne uge'].push(s);
-    else groups['Tidligere'].push(s);
+    if (isToday(d)) groups.Today.push(s);
+    else if (isYesterday(d)) groups.Yesterday.push(s);
+    else if (isThisWeek(d)) groups['This week'].push(s);
+    else groups.Earlier.push(s);
   });
   return groups;
 }
@@ -45,10 +45,10 @@ export default function ConversationSidebar({ sessions, activeSessionId, onSelec
       )}>
         {/* Header */}
         <div className="p-4 border-b border-border/50 flex items-center justify-between gap-2">
-          <span className="font-semibold text-sm">Samtaler</span>
+          <span className="font-semibold text-sm">Conversations</span>
           <div className="flex items-center gap-1">
             <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={onNewChat}>
-              <Plus className="w-3.5 h-3.5" /> Ny
+              <Plus className="w-3.5 h-3.5" /> New
             </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" onClick={onClose}>
               <X className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function ConversationSidebar({ sessions, activeSessionId, onSelec
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
-              placeholder="Søg i samtaler..."
+              placeholder="Search conversations..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-8 h-8 text-sm bg-secondary/50"
@@ -98,10 +98,10 @@ export default function ConversationSidebar({ sessions, activeSessionId, onSelec
                           )} />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium truncate leading-tight">
-                              {session.preview || 'Tom samtale'}
+                              {session.preview || 'Empty conversation'}
                             </p>
                             <p className="text-[10px] text-muted-foreground mt-0.5">
-                              {session.messageCount} beskeder · {format(new Date(session.lastDate), 'HH:mm')}
+                              {session.messageCount} messages · {format(new Date(session.lastDate), 'HH:mm')}
                             </p>
                           </div>
                         </div>
@@ -116,7 +116,7 @@ export default function ConversationSidebar({ sessions, activeSessionId, onSelec
               <div className="text-center py-8">
                 <MessageSquare className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
                 <p className="text-xs text-muted-foreground">
-                  {query ? 'Ingen resultater' : 'Ingen samtaler endnu'}
+                  {query ? 'No results' : 'No conversations yet'}
                 </p>
               </div>
             )}

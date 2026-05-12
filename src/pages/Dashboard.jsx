@@ -10,9 +10,10 @@ import { Card } from '@/components/ui/card';
 import { Brain, GitBranch, HeartHandshake, Plus, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DonationButton from '@/components/DonationButton';
-import { openSourceMessage } from '@/lib/donations';
+import { useLanguage } from '@/lib/i18n';
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const { data: faces, isLoading } = useQuery({
     queryKey: ['aifaces'],
     queryFn: () => base44.entities.AIFace.list('-updated_date'),
@@ -53,25 +54,25 @@ export default function Dashboard() {
             SnapTrainer
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Din personlige AI-identitet med et usynligt agentteam
+            {t('dashboard.heroTitle')}
           </h1>
           <p className="text-muted-foreground mt-3">
-            Byg et AIFace, der lærer din tone, dine filer og dine præferencer - og lad SnapTrainer route større opgaver gennem specialister.
+            {t('dashboard.heroText')}
           </p>
           <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
             <HeartHandshake className="w-5 h-5 text-emerald-600 shrink-0" />
-            <p className="text-sm text-muted-foreground flex-1">{openSourceMessage}</p>
+            <p className="text-sm text-muted-foreground flex-1">{t('donation.message')}</p>
             <DonationButton size="sm" />
           </div>
           <div className="flex flex-wrap gap-3 mt-6">
             <Link to="/create">
               <Button className="gap-2 shadow-lg shadow-primary/20">
                 <Plus className="w-4 h-4" />
-                Opret AIFace
+                {t('dashboard.create')}
               </Button>
             </Link>
             <span className="text-sm text-muted-foreground self-center">
-              {faces.length} aktiv{faces.length !== 1 ? 'e' : ''} AI-identitet{faces.length !== 1 ? 'er' : ''}
+              {faces.length} {faces.length === 1 ? t('dashboard.activeIdentity') : t('dashboard.activeIdentities')}
             </span>
           </div>
         </div>
@@ -81,18 +82,18 @@ export default function Dashboard() {
         {[
           {
             icon: Brain,
-            title: 'Personlig læring',
-            text: 'AIFacet bruger filer, præferencer, historik og feedback til at blive mere præcist.',
+            title: t('dashboard.personalLearning'),
+            text: t('dashboard.personalLearningText'),
           },
           {
             icon: GitBranch,
-            title: 'Orkestrering',
-            text: 'Komplekse prompts opdeles, routes og kan køre i sekventielle eller parallelle specialist-lanes.',
+            title: t('dashboard.orchestration'),
+            text: t('dashboard.orchestrationText'),
           },
           {
             icon: ShieldCheck,
-            title: 'Synlig kontrol',
-            text: 'Du kan se profil, viden, feedback, agenttrin, quality gates og fallback-logik.',
+            title: t('dashboard.transparentControl'),
+            text: t('dashboard.transparentControlText'),
           },
         ].map((item) => (
           <Card key={item.title} className="p-4 border-border/50">

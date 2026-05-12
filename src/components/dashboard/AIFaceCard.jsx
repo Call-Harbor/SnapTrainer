@@ -15,9 +15,9 @@ const modelLabels = {
 };
 
 const statusConfig = {
-  building: { label: 'Opbygges', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  ready: { label: 'Klar', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
-  training: { label: 'Træner', color: 'bg-primary/10 text-primary border-primary/20' },
+  building: { label: 'Building', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  ready: { label: 'Ready', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
+  training: { label: 'Training', color: 'bg-primary/10 text-primary border-primary/20' },
 };
 
 export default function AIFaceCard({ face, index }) {
@@ -47,7 +47,7 @@ export default function AIFaceCard({ face, index }) {
                 <div>
                   <h3 className="font-semibold text-lg leading-tight">{face.name}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {face.role || 'Personlig AI'} · {modelLabels[face.model] || face.model}
+                    {face.role || 'Personal AI'} · {modelLabels[face.model] || face.model}
                   </p>
                 </div>
               </div>

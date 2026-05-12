@@ -13,16 +13,16 @@ export default function StylePreferences({ preferences, onChange }) {
       <div className="space-y-2">
         <Label className="text-sm font-medium">Tone</Label>
         <Input
-          placeholder="F.eks. venlig, professionel, humoristisk..."
+          placeholder="E.g. friendly, professional, humorous..."
           value={preferences.tone || ''}
           onChange={(e) => update('tone', e.target.value)}
         />
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-medium">Sprog</Label>
+        <Label className="text-sm font-medium">Language</Label>
         <Input
-          placeholder="F.eks. dansk, engelsk, blandet..."
+          placeholder="E.g. English, Danish, mixed..."
           value={preferences.language || ''}
           onChange={(e) => update('language', e.target.value)}
         />
@@ -30,7 +30,7 @@ export default function StylePreferences({ preferences, onChange }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Detaljering</Label>
+          <Label className="text-sm font-medium">Detail level</Label>
           <Select
             value={preferences.verbosity || 'medium'}
             onValueChange={(v) => update('verbosity', v)}
@@ -39,15 +39,15 @@ export default function StylePreferences({ preferences, onChange }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="kort">Kort og præcis</SelectItem>
-              <SelectItem value="medium">Balanceret</SelectItem>
-              <SelectItem value="detaljeret">Detaljeret</SelectItem>
+              <SelectItem value="kort">Short and precise</SelectItem>
+              <SelectItem value="medium">Balanced</SelectItem>
+              <SelectItem value="detaljeret">Detailed</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Formalitet</Label>
+          <Label className="text-sm font-medium">Formality</Label>
           <Select
             value={preferences.formality || 'neutral'}
             onValueChange={(v) => update('formality', v)}
@@ -56,9 +56,9 @@ export default function StylePreferences({ preferences, onChange }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="uformel">Uformel</SelectItem>
+              <SelectItem value="uformel">Informal</SelectItem>
               <SelectItem value="neutral">Neutral</SelectItem>
-              <SelectItem value="formel">Formel</SelectItem>
+              <SelectItem value="formel">Formal</SelectItem>
             </SelectContent>
           </Select>
         </div>

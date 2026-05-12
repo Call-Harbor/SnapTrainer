@@ -3,14 +3,17 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Plus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import DonationButton from '@/components/DonationButton';
-
-const navItems = [
-  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/create', icon: Plus, label: 'Nyt AIFace' },
-];
+import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/lib/i18n';
 
 export default function AppLayout() {
   const location = useLocation();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { path: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { path: '/create', icon: Plus, label: t('nav.newAIFace') },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,6 +30,7 @@ export default function AppLayout() {
           </Link>
 
           <nav className="flex items-center gap-1">
+            <LanguageSelector />
             <DonationButton size="sm" className="hidden md:inline-flex" />
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;

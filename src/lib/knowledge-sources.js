@@ -17,13 +17,13 @@ export function getValidFaqItems(items = []) {
 
 export function buildWebSourceSummary(source) {
   return [
-    `Webkilde: ${source.url}`,
+    `Web source: ${source.url}`,
     `Crawl mode: ${source.crawl_mode || 'smart'}`,
     `Crawl depth: ${source.crawl_depth || 'page'}`,
     source.include_patterns && `Include patterns: ${source.include_patterns}`,
     source.exclude_patterns && `Exclude patterns: ${source.exclude_patterns}`,
-    source.notes && `Læringsnoter: ${source.notes}`,
-    'Brug denne kilde som en web-crawl instruktion i knowledge sweep. Hvis modellen ikke kan hente live-indhold, skal den tydeligt markere, at kun URL-metadata er tilgængelig.',
+    source.notes && `Learning notes: ${source.notes}`,
+    'Use this source as a web-crawl instruction in the knowledge sweep. If the model cannot fetch live content, it must clearly state that only URL metadata is available.',
   ]
     .filter(Boolean)
     .join('\n');
@@ -31,8 +31,8 @@ export function buildWebSourceSummary(source) {
 
 export function buildFaqSummary(item) {
   return [
-    `FAQ-spørgsmål: ${item.question}`,
-    `FAQ-svar: ${item.answer}`,
+    `FAQ question: ${item.question}`,
+    `FAQ answer: ${item.answer}`,
     item.tags && `Tags: ${item.tags}`,
   ]
     .filter(Boolean)

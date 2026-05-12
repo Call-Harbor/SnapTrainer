@@ -19,40 +19,42 @@ import {
   getValidFaqItems,
   getValidWebSources,
 } from '@/lib/knowledge-sources';
+import { useLanguage } from '@/lib/i18n';
 
 const roles = [
   'Business advisor',
-  'Studiemakker',
+  'Study partner',
   'Planner',
   'Creative partner',
   'Support specialist',
-  'Personlig assistent',
-];
-
-const steps = [
-  { title: 'Navngiv', subtitle: 'Giv dit AIFace en identitet og rolle' },
-  { title: 'Vælg model', subtitle: 'Vælg frit mellem alle modeller - alt er gratis at bruge' },
-  { title: 'Stilpræferencer', subtitle: 'Fortæl hvordan din AI skal kommunikere' },
-  { title: 'Avanceret træning', subtitle: 'Valgfrit ekspertlag for AI/ML-specialister' },
-  { title: 'Knowledge sources', subtitle: 'Upload filer, crawl URLer og tilføj FAQer' },
+  'Personal assistant',
 ];
 
 export default function CreateAIFace() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const [name, setName] = useState('');
   const [model, setModel] = useState('');
-  const [role, setRole] = useState('Personlig assistent');
+  const [role, setRole] = useState('Personal assistant');
   const [preferences, setPreferences] = useState({
-    tone: '', language: 'dansk', verbosity: 'medium', formality: 'neutral', role: 'Personlig assistent',
+    tone: '', language: 'English', verbosity: 'medium', formality: 'neutral', role: 'Personal assistant',
   });
   const [advancedTraining, setAdvancedTraining] = useState(defaultAdvancedTrainingConfig);
   const [files, setFiles] = useState([]);
   const [webSources, setWebSources] = useState([]);
   const [faqItems, setFaqItems] = useState([]);
+
+  const steps = [
+    { title: t('create.stepName'), subtitle: t('create.stepNameSub') },
+    { title: t('create.stepModel'), subtitle: t('create.stepModelSub') },
+    { title: t('create.stepStyle'), subtitle: t('create.stepStyleSub') },
+    { title: t('create.stepAdvanced'), subtitle: t('create.stepAdvancedSub') },
+    { title: t('create.stepKnowledge'), subtitle: t('create.stepKnowledgeSub') },
+  ];
 
   const canNext = () => {
     if (step === 0) return name.trim().length > 0;
@@ -66,10 +68,10 @@ export default function CreateAIFace() {
     // Build identity prompt from preferences
     let identityParts = [];
     if (preferences.tone) identityParts.push(`Tone: ${preferences.tone}`);
-    if (preferences.language) identityParts.push(`Sprog: ${preferences.language}`);
-    if (role) identityParts.push(`Rolle: ${role}`);
-    identityParts.push(`Detaljering: ${preferences.verbosity}`);
-    identityParts.push(`Formalitet: ${preferences.formality}`);
+    if (preferences.language) identityParts.push(`Language: ${preferences.language}`);
+    if (role) identityParts.push(`Role: ${role}`);
+    identityParts.push(`Detail level: ${preferences.verbosity}`);
+    identityParts.push(`Formality: ${preferences.formality}`);
     const advancedTrainingSummary = summarizeAdvancedTrainingForPrompt(advancedTraining);
     if (advancedTrainingSummary) identityParts.push(advancedTrainingSummary);
 
@@ -137,12 +139,12 @@ export default function CreateAIFace() {
         });
       }
 
-      const summaryPrompt = `Du er en AI-assistent der analyserer brugerens træningskilder for at opbygge en brugerprofil.
-Filerne er: ${files.map(f => f.file.name).join(', ') || 'ingen'}.
-Webkilder er: ${validWebSources.map(source => source.url).join(', ') || 'ingen'}.
-FAQ-træning: ${validFaqItems.length} FAQ-par.
-Brugeren foretrækker: ${identityParts.join(', ')}. 
-Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om brugerens stil, videnkilder og behov.`;
+      const summaryPrompt = `You are an AI assistant analyzing the user's training sources to build a user profile.
+Files: ${files.map(f => f.file.name).join(', ') || 'none'}.
+Web sources: ${validWebSources.map(source => source.url).join(', ') || 'none'}.
+FAQ training: ${validFaqItems.length} FAQ pairs.
+User preferences: ${identityParts.join(', ')}.
+Write a short summary (2-3 sentences) of what this AI agent has learned about the user's style, knowledge sources and needs.`;
 
       const summary = await base44.integrations.Core.InvokeLLM({ prompt: summaryPrompt });
       await base44.entities.AIFace.update(face.id, {
@@ -157,7 +159,7 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
   return (
     <div className="max-w-2xl mx-auto">
       <Button variant="ghost" className="gap-2 mb-6 text-muted-foreground" onClick={() => navigate('/')}>
-        <ArrowLeft className="w-4 h-4" /> Tilbage
+        <ArrowLeft className="w-4 h-4" /> {t('create.back')}
       </Button>
 
       {/* Progress */}
@@ -196,9 +198,9 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
             {step === 0 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Navn</Label>
+                  <Label className="text-sm font-medium">{t('create.nameLabel')}</Label>
                   <Input
-                    placeholder="F.eks. 'Min arbejdsassistent', 'Kreativ skribent'..."
+                    placeholder={t('create.namePlaceholder')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="text-lg h-12"
@@ -206,7 +208,7 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Rolle</Label>
+                  <Label className="text-sm font-medium">{t('create.roleLabel')}</Label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {roles.map((item) => (
                       <button
@@ -253,7 +255,7 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
                   disabled={uploading}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Du kan altid tilføje flere filer, URL'er og FAQ'er senere. SnapTrainer bruger materialet i AIFacets knowledge sweep.
+                  {t('create.knowledgeNote')}
                 </p>
               </div>
             )}
@@ -268,7 +270,7 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
           disabled={step === 0}
           className="gap-2"
         >
-          <ArrowLeft className="w-4 h-4" /> Forrige
+          <ArrowLeft className="w-4 h-4" /> {t('create.previous')}
         </Button>
 
         {step < steps.length - 1 ? (
@@ -277,7 +279,7 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
             disabled={!canNext()}
             className="gap-2 shadow-lg shadow-primary/20"
           >
-            Næste <ArrowRight className="w-4 h-4" />
+            {t('create.next')} <ArrowRight className="w-4 h-4" />
           </Button>
         ) : (
           <Button
@@ -288,12 +290,12 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
             {creating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {uploading ? 'Uploader filer...' : 'Opretter...'}
+                {uploading ? t('create.uploading') : t('create.creating')}
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                Opret AIFace
+                {t('create.createAIFace')}
               </>
             )}
           </Button>
