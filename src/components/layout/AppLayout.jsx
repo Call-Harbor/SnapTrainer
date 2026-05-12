@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import DonationButton from '@/components/DonationButton';
 
 const navItems = [
-  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/app', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/create', icon: Plus, label: 'New AIFace' },
 ];
 
