@@ -18,6 +18,7 @@ import WebKnowledgeTrainer from '@/components/create/WebKnowledgeTrainer';
 import StylePreferences from '@/components/create/StylePreferences';
 import ModelSelector from '@/components/create/ModelSelector';
 import AdvancedTrainingPanel from '@/components/create/AdvancedTrainingPanel';
+import MemoryManager from '@/components/profile/MemoryManager';
 import {
   defaultAdvancedTrainingConfig,
   normalizeAdvancedTrainingConfig,
@@ -29,6 +30,7 @@ import {
   getValidFaqItems,
   getValidWebSources,
 } from '@/lib/knowledge-sources';
+import { crawlWebSource, summarizeCrawl } from '@/services/webCrawler';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import ExportPDFButton from '@/components/profile/ExportPDFButton';
 
@@ -119,6 +121,12 @@ export default function AIFaceProfile() {
     initialData: [],
   });
 
+  const { data: memoryItems = [] } = useQuery({
+    queryKey: ['memory', id],
+    queryFn: () => base44.entities.MemoryItem ? base44.entities.MemoryItem.filter({ aiface_id: id }) : [],
+    initialData: [],
+  });
+
   const [preferences, setPreferences] = useState(null);
   const [model, setModel] = useState(null);
   const [role, setRole] = useState(null);
@@ -180,6 +188,7 @@ export default function AIFaceProfile() {
     setUploading(false);
     queryClient.invalidateQueries({ queryKey: ['knowledge', id] });
     queryClient.invalidateQueries({ queryKey: ['aiface', id] });
+    queryClient.invalidateQueries({ queryKey: ['memory', id] });
   };
 
   const handleAddWebKnowledge = async () => {
@@ -191,7 +200,17 @@ export default function AIFaceProfile() {
     setUploading(true);
 
     for (const source of validWebSources) {
-      const summary = buildWebSourceSummary(source);
+      const crawlResult = await crawlWebSource(source);
+      const crawlSummary = crawlResult.status === 'ready'
+        ? await summarizeCrawl({
+          source,
+          crawlResult,
+          invokeLLM: ({ prompt }) => base44.integrations.Core.InvokeLLM({ prompt }),
+        })
+        : buildWebSourceSummary(source);
+      const summary = crawlResult.status === 'ready'
+        ? crawlSummary
+        : `${buildWebSourceSummary(source)}\n\nCrawler status: ${crawlResult.error}`;
       await base44.entities.KnowledgeItem.create({
         aiface_id: id,
         file_name: source.url,
@@ -203,9 +222,10 @@ export default function AIFaceProfile() {
         include_patterns: source.include_patterns,
         exclude_patterns: source.exclude_patterns,
         tags: source.notes,
-        training_text: summary,
+        training_text: crawlResult.text || summary,
         extracted_summary: summary,
-        status: 'ready',
+        status: crawlResult.status,
+        crawl_result: crawlResult,
       });
     }
 
@@ -234,6 +254,7 @@ export default function AIFaceProfile() {
     setUploading(false);
     queryClient.invalidateQueries({ queryKey: ['knowledge', id] });
     queryClient.invalidateQueries({ queryKey: ['aiface', id] });
+    queryClient.invalidateQueries({ queryKey: ['memory', id] });
   };
 
   const handleDelete = async () => {
@@ -337,7 +358,7 @@ export default function AIFaceProfile() {
       )}
 
       <Tabs defaultValue="settings" className="space-y-6">
-        <TabsList className="grid grid-cols-5">
+        <TabsList className="grid grid-cols-6">
           <TabsTrigger value="settings" className="gap-1.5">
             <Settings className="w-3.5 h-3.5" /> Settings
           </TabsTrigger>
@@ -349,6 +370,9 @@ export default function AIFaceProfile() {
           </TabsTrigger>
           <TabsTrigger value="training" className="gap-1.5">
             <Sparkles className="w-3.5 h-3.5" /> Training
+          </TabsTrigger>
+          <TabsTrigger value="memory" className="gap-1.5">
+            <Brain className="w-3.5 h-3.5" /> Memory
           </TabsTrigger>
           <TabsTrigger value="feedback" className="gap-1.5">
             <Brain className="w-3.5 h-3.5" /> Adaptation
@@ -540,6 +564,10 @@ export default function AIFaceProfile() {
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             Save training
           </Button>
+        </TabsContent>
+
+        <TabsContent value="memory" className="space-y-6">
+          <MemoryManager aifaceId={id} memoryItems={memoryItems} />
         </TabsContent>
 
         <TabsContent value="feedback" className="space-y-6">

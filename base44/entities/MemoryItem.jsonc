@@ -1,0 +1,52 @@
+{
+  "name": "MemoryItem",
+  "type": "object",
+  "properties": {
+    "aiface_id": {
+      "type": "string",
+      "description": "Reference to the AIFace"
+    },
+    "memory_type": {
+      "type": "string",
+      "enum": [
+        "preference",
+        "fact",
+        "style",
+        "workflow",
+        "constraint"
+      ],
+      "default": "preference"
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the memory came from"
+    },
+    "confidence": {
+      "type": "number",
+      "default": 0.8
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "archived"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "aiface_id",
+    "title",
+    "content"
+  ]
+}

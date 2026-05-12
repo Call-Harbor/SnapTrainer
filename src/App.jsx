@@ -10,6 +10,7 @@ import CreateAIFace from './pages/CreateAIFace';
 import ChatWithAIFace from './pages/ChatWithAIFace';
 import AIFaceProfile from './pages/AIFaceProfile';
 import LandingPage from './pages/LandingPage';
+import MissionControl from './pages/MissionControl';
 import AppLayout from './components/layout/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -43,6 +44,7 @@ const AuthenticatedApp = () => {
         <Route path="/create" element={<CreateAIFace />} />
         <Route path="/chat/:id" element={<ChatWithAIFace />} />
         <Route path="/profile/:id" element={<AIFaceProfile />} />
+        <Route path="/mission-control" element={<MissionControl />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

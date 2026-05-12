@@ -1,12 +1,13 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Plus, Sparkles } from 'lucide-react';
+import { Activity, LayoutDashboard, Plus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import DonationButton from '@/components/DonationButton';
 
 const navItems = [
   { path: '/app', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/create', icon: Plus, label: 'New AIFace' },
+  { path: '/mission-control', icon: Activity, label: 'Mission Control' },
 ];
 
 export default function AppLayout() {

@@ -1,0 +1,35 @@
+{
+  "name": "EvalRun",
+  "type": "object",
+  "properties": {
+    "aiface_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "suite": {
+      "type": "string",
+      "default": "production"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "scores": {
+      "type": "object"
+    },
+    "passed": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "raw_result": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "run_id",
+    "suite"
+  ]
+}
