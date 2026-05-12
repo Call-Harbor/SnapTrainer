@@ -8,7 +8,7 @@ function compactMessages(messages = [], limit = 12) {
   }));
 }
 
-export function createMemoryPartitions({ face, sessionMessages, feedbackEntries, knowledgeItems }) {
+export function createMemoryPartitions({ face, sessionMessages, feedbackEntries, knowledgeItems, memoryItems = [] }) {
   const styleHints = feedbackEntries
     .filter((entry) => entry.feedback_type === 'style_hint' && entry.feedback_text)
     .map((entry) => entry.feedback_text);
@@ -42,6 +42,16 @@ export function createMemoryPartitions({ face, sessionMessages, feedbackEntries,
       retrievedMemory,
       knowledgeCount: knowledgeItems.length,
       feedbackCount: feedbackEntries.length,
+      longTermMemories: memoryItems
+        .filter((item) => item.status !== 'archived')
+        .map((item) => ({
+          type: item.memory_type,
+          title: item.title,
+          content: item.content,
+          confidence: item.confidence,
+          pinned: item.pinned,
+          source: item.source,
+        })),
     },
   };
 }
@@ -60,6 +70,7 @@ export function buildGovernanceBoundaries(memory, userGoal) {
       memory.preferences.identityPrompt,
       memory.preferences.knowledgeSummary,
       ...memory.preferences.styleHints,
+      ...memory.workflow.longTermMemories.map((item) => `${item.title}: ${item.content}`),
     ].filter(Boolean),
     uploadedSourceMaterial: memory.workflow.retrievedMemory.map((item) => `[${item.type}] ${item.source}: ${item.content}`),
     agentGeneratedText: [],

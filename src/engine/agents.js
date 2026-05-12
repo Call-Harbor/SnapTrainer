@@ -3,6 +3,7 @@ import { buildAgentContext } from './memory.js';
 import { validateAgentOutput } from './validation.js';
 import { validateIntermediateOutput } from './outputValidation.js';
 import { ENGINE_EVENT_TYPES } from './orchestrationEvents.js';
+import { getAgentDefinition } from './agentRegistry.js';
 
 export const specialistAgents = {
   intent: 'Intent parser',
@@ -19,9 +20,12 @@ export const specialistAgents = {
 };
 
 function buildAgentPrompt({ runState, subtask, priorOutputs }) {
+  const definition = getAgentDefinition(subtask.assignedAgent);
   return `${buildAgentContext({ runState, subtask, priorOutputs })}
 
-You are the ${specialistAgents[subtask.assignedAgent] || subtask.assignedAgent}.
+You are the ${definition.name}.
+Specialist purpose: ${definition.purpose}
+Output contract: ${definition.outputContract}
 Task objective: ${subtask.objective}
 
 Return useful intermediate work for downstream agents. Keep boundaries clear:
@@ -50,7 +54,7 @@ export async function executeAgent({ runState, subtask, priorOutputs, invokeLLM,
         message: `LLM call for ${subtask.assignedAgent}`,
         data: { subtaskId: subtask.id },
       },
-      () => invokeLLM({ prompt, agentId: subtask.assignedAgent, subtask })
+      () => invokeLLM({ prompt, agentId: subtask.assignedAgent, subtask, agentDefinition: getAgentDefinition(subtask.assignedAgent) })
     );
 
     const candidate = {

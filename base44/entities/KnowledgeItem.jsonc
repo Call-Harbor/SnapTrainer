@@ -75,6 +75,10 @@
       "type": "string",
       "description": "Structured text used as direct training context"
     },
+    "crawl_result": {
+      "type": "object",
+      "description": "Structured crawl result including fetched pages, errors and timestamps"
+    },
     "extracted_summary": {
       "type": "string",
       "description": "AI-extracted summary of the file content"

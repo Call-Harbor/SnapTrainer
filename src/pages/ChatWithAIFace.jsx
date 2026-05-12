@@ -11,6 +11,8 @@ import ConversationSidebar from '@/components/chat/ConversationSidebar';
 import OrchestrationActivity from '@/components/chat/OrchestrationActivity';
 import { executeSnapTrainerRun } from '@/engine/runner';
 import { runStateToActivityPlan, runStateToChatMetadata } from '@/engine/compat';
+import { resolveAgentModel } from '@/engine/agentRegistry';
+import { buildProductionEvalRecord } from '@/engine/productionEval';
 
 function generateSessionId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -49,6 +51,12 @@ export default function ChatWithAIFace() {
   const { data: knowledgeItems = [] } = useQuery({
     queryKey: ['knowledge', id],
     queryFn: () => base44.entities.KnowledgeItem.filter({ aiface_id: id }),
+    initialData: [],
+  });
+
+  const { data: memoryItems = [] } = useQuery({
+    queryKey: ['memory', id],
+    queryFn: () => base44.entities.MemoryItem ? base44.entities.MemoryItem.filter({ aiface_id: id }) : [],
     initialData: [],
   });
 
@@ -107,9 +115,10 @@ export default function ChatWithAIFace() {
         sessionMessages,
         feedbackEntries,
         knowledgeItems,
-        invokeLLM: ({ prompt }) => base44.integrations.Core.InvokeLLM({
+        memoryItems,
+        invokeLLM: ({ prompt, agentId }) => base44.integrations.Core.InvokeLLM({
           prompt,
-          model: face?.model || 'gpt_5_mini',
+          model: resolveAgentModel(agentId, face?.model || 'gpt_5_mini'),
         }),
         onEvent: (_event, runState) => {
           setActivePlan(runStateToActivityPlan(runState));
@@ -140,6 +149,18 @@ export default function ChatWithAIFace() {
         }
       } catch (error) {
         console.warn('Unable to persist orchestration run', error);
+      }
+
+      try {
+        if (base44.entities.EvalRun && runResult.evaluation) {
+          await base44.entities.EvalRun.create(buildProductionEvalRecord({
+            aifaceId: id,
+            runState: runResult.runState,
+            evaluation: runResult.evaluation,
+          }));
+        }
+      } catch (error) {
+        console.warn('Unable to persist production eval', error);
       }
 
       await base44.entities.ChatMessage.create({

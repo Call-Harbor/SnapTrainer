@@ -144,10 +144,11 @@ export async function executeSnapTrainerRun({
   sessionMessages,
   feedbackEntries,
   knowledgeItems,
+  memoryItems = [],
   invokeLLM,
   onEvent,
 }) {
-  const memory = createMemoryPartitions({ face, sessionMessages, feedbackEntries, knowledgeItems });
+  const memory = createMemoryPartitions({ face, sessionMessages, feedbackEntries, knowledgeItems, memoryItems });
   const boundaries = buildGovernanceBoundaries(memory, userGoal);
   const runState = createRunState({ userGoal, userId, sessionId, memory, boundaries });
   const telemetry = createTelemetry(runState.runId);

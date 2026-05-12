@@ -19,6 +19,7 @@ import {
   getValidFaqItems,
   getValidWebSources,
 } from '@/lib/knowledge-sources';
+import { crawlWebSource, summarizeCrawl } from '@/services/webCrawler';
 
 const roles = [
   'Business advisor',
@@ -103,7 +104,17 @@ export default function CreateAIFace() {
       }
 
       for (const source of validWebSources) {
-        const summary = buildWebSourceSummary(source);
+        const crawlResult = await crawlWebSource(source);
+        const crawlSummary = crawlResult.status === 'ready'
+          ? await summarizeCrawl({
+            source,
+            crawlResult,
+            invokeLLM: ({ prompt }) => base44.integrations.Core.InvokeLLM({ prompt }),
+          })
+          : buildWebSourceSummary(source);
+        const summary = crawlResult.status === 'ready'
+          ? crawlSummary
+          : `${buildWebSourceSummary(source)}\n\nCrawler status: ${crawlResult.error}`;
         await base44.entities.KnowledgeItem.create({
           aiface_id: face.id,
           file_name: source.url,
@@ -115,9 +126,10 @@ export default function CreateAIFace() {
           include_patterns: source.include_patterns,
           exclude_patterns: source.exclude_patterns,
           tags: source.notes,
-          training_text: summary,
+          training_text: crawlResult.text || summary,
           extracted_summary: summary,
-          status: 'ready',
+          status: crawlResult.status,
+          crawl_result: crawlResult,
         });
       }
 
