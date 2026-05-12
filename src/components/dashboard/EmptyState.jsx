@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { GitBranch, Plus, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import DonationButton from '@/components/DonationButton';
+import { openSourceMessage } from '@/lib/donations';
 
 export default function EmptyState() {
   return (
@@ -23,12 +25,18 @@ export default function EmptyState() {
       <p className="text-muted-foreground text-center max-w-md mb-8">
         Opret et AIFace, der lærer din stil og kan bruge et usynligt team af specialistagenter til mere komplekse opgaver.
       </p>
-      <Link to="/create">
-        <Button size="lg" className="gap-2 shadow-lg shadow-primary/25">
-          <Plus className="w-5 h-5" />
-          Opret dit første AIFace
-        </Button>
-      </Link>
+      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-center max-w-lg mb-6">
+        <p className="text-sm text-muted-foreground">{openSourceMessage}</p>
+      </div>
+      <div className="flex flex-wrap justify-center gap-3">
+        <Link to="/create">
+          <Button size="lg" className="gap-2 shadow-lg shadow-primary/25">
+            <Plus className="w-5 h-5" />
+            Opret dit første AIFace
+          </Button>
+        </Link>
+        <DonationButton size="lg" />
+      </div>
     </motion.div>
   );
 }

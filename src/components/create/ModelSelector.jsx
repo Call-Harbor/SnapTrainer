@@ -1,14 +1,14 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Zap, Brain, Crown, Sparkles, Gem } from 'lucide-react';
+import { Zap, Brain, Crown, Sparkles, Gem, HeartHandshake } from 'lucide-react';
 
 const models = [
   {
     id: 'gpt_5_mini',
     name: 'GPT-5 Mini',
-    description: 'Hurtig og billig — perfekt til daglige opgaver',
+    description: 'Hurtig og gratis at bruge — perfekt til daglige opgaver',
     icon: Zap,
-    tier: 'Standard',
+    tier: 'Free',
     color: 'from-emerald-500 to-teal-500',
   },
   {
@@ -16,31 +16,31 @@ const models = [
     name: 'Gemini 3 Flash',
     description: 'Hurtig med internetsøgning og multimodal forståelse',
     icon: Sparkles,
-    tier: 'Standard',
+    tier: 'Free',
     color: 'from-blue-500 to-cyan-500',
   },
   {
     id: 'gpt_5_4',
     name: 'GPT-5.4',
-    description: 'Stærkere resonering og dybere analyse',
+    description: 'Stærkere resonering og dybere analyse — gratis i SnapTrainer',
     icon: Brain,
-    tier: 'Premium',
+    tier: 'Free',
     color: 'from-violet-500 to-purple-500',
   },
   {
     id: 'claude_sonnet_4_6',
     name: 'Claude Sonnet',
-    description: 'Fremragende til skrivning, kode og nuancerede svar',
+    description: 'Fremragende til skrivning, kode og nuancerede svar — gratis',
     icon: Gem,
-    tier: 'Premium',
+    tier: 'Free',
     color: 'from-orange-500 to-amber-500',
   },
   {
     id: 'claude_opus_4_6',
     name: 'Claude Opus',
-    description: 'Mest kraftfulde model — til komplekse, kreative opgaver',
+    description: 'Kraftfuld model til komplekse, kreative opgaver — gratis',
     icon: Crown,
-    tier: 'Pro',
+    tier: 'Free',
     color: 'from-rose-500 to-pink-500',
   },
 ];
@@ -48,6 +48,15 @@ const models = [
 export default function ModelSelector({ selected, onSelect }) {
   return (
     <div className="grid gap-3">
+      <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-3">
+        <HeartHandshake className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+        <div>
+          <p className="text-sm font-medium">Alle modeller er free to use</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            SnapTrainer er open source og finansieres af frivillige donationer - ikke model-paywalls.
+          </p>
+        </div>
+      </div>
       {models.map((model) => {
         const isSelected = selected === model.id;
         return (
@@ -69,9 +78,7 @@ export default function ModelSelector({ selected, onSelect }) {
                 <span className="font-semibold text-sm">{model.name}</span>
                 <span className={cn(
                   "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                  model.tier === 'Standard' && "bg-secondary text-muted-foreground",
-                  model.tier === 'Premium' && "bg-primary/10 text-primary",
-                  model.tier === 'Pro' && "bg-accent/10 text-accent"
+                  "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
                 )}>
                   {model.tier}
                 </span>

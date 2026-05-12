@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Plus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import DonationButton from '@/components/DonationButton';
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -26,6 +27,7 @@ export default function AppLayout() {
           </Link>
 
           <nav className="flex items-center gap-1">
+            <DonationButton size="sm" className="hidden md:inline-flex" />
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
