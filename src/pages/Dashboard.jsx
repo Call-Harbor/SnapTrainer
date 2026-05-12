@@ -10,10 +10,9 @@ import { Card } from '@/components/ui/card';
 import { Brain, GitBranch, HeartHandshake, Plus, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DonationButton from '@/components/DonationButton';
-import { useLanguage } from '@/lib/i18n';
+import { openSourceMessage } from '@/lib/donations';
 
 export default function Dashboard() {
-  const { t } = useLanguage();
   const { data: faces, isLoading } = useQuery({
     queryKey: ['aifaces'],
     queryFn: () => base44.entities.AIFace.list('-updated_date'),
@@ -54,25 +53,25 @@ export default function Dashboard() {
             SnapTrainer
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            {t('dashboard.heroTitle')}
+            Your personal AI identity with an invisible agent team
           </h1>
           <p className="text-muted-foreground mt-3">
-            {t('dashboard.heroText')}
+            Build an AIFace that learns your tone, files and preferences - and let SnapTrainer route complex tasks through specialists.
           </p>
           <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
             <HeartHandshake className="w-5 h-5 text-emerald-600 shrink-0" />
-            <p className="text-sm text-muted-foreground flex-1">{t('donation.message')}</p>
+            <p className="text-sm text-muted-foreground flex-1">{openSourceMessage}</p>
             <DonationButton size="sm" />
           </div>
           <div className="flex flex-wrap gap-3 mt-6">
             <Link to="/create">
               <Button className="gap-2 shadow-lg shadow-primary/20">
                 <Plus className="w-4 h-4" />
-                {t('dashboard.create')}
+                Create AIFace
               </Button>
             </Link>
             <span className="text-sm text-muted-foreground self-center">
-              {faces.length} {faces.length === 1 ? t('dashboard.activeIdentity') : t('dashboard.activeIdentities')}
+              {faces.length} active AI identit{faces.length === 1 ? 'y' : 'ies'}
             </span>
           </div>
         </div>
@@ -82,18 +81,18 @@ export default function Dashboard() {
         {[
           {
             icon: Brain,
-            title: t('dashboard.personalLearning'),
-            text: t('dashboard.personalLearningText'),
+            title: 'Personal learning',
+            text: 'Your AIFace uses files, preferences, history and feedback to become more accurate.',
           },
           {
             icon: GitBranch,
-            title: t('dashboard.orchestration'),
-            text: t('dashboard.orchestrationText'),
+            title: 'Orchestration',
+            text: 'Complex prompts are decomposed, routed and can run through sequential or parallel specialist lanes.',
           },
           {
             icon: ShieldCheck,
-            title: t('dashboard.transparentControl'),
-            text: t('dashboard.transparentControlText'),
+            title: 'Transparent control',
+            text: 'You can inspect profile, knowledge, feedback, agent steps, quality gates and fallback logic.',
           },
         ].map((item) => (
           <Card key={item.title} className="p-4 border-border/50">

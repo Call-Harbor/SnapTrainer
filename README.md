@@ -4,7 +4,7 @@ SnapTrainer is an open source AI platform for personal AIFaces, multi-agent orch
 
 All models in the product are positioned as free to use. The platform is intended to be supported by voluntary donations rather than paid model tiers or paywalls.
 
-The default product language is English. The app includes a language switcher for commonly used European languages, including Danish, German, French, Spanish, Italian, Dutch, Portuguese, Polish, Swedish, Norwegian, and Finnish.
+The product language is English only. SnapTrainer does not expose a language switcher.
 
 To configure the PayPal donation button, set:
 

@@ -10,7 +10,6 @@ import CreateAIFace from './pages/CreateAIFace';
 import ChatWithAIFace from './pages/ChatWithAIFace';
 import AIFaceProfile from './pages/AIFaceProfile';
 import AppLayout from './components/layout/AppLayout';
-import { LanguageProvider } from '@/lib/i18n';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -53,16 +52,14 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
-      </AuthProvider>
-    </LanguageProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClientInstance}>
+        <Router>
+          <AuthenticatedApp />
+        </Router>
+        <Toaster />
+      </QueryClientProvider>
+    </AuthProvider>
   )
 }
 

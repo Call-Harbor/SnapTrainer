@@ -1,13 +1,12 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Zap, Brain, Crown, Sparkles, Gem, HeartHandshake } from 'lucide-react';
-import { useLanguage } from '@/lib/i18n';
 
 const models = [
   {
     id: 'gpt_5_mini',
     name: 'GPT-5 Mini',
-    descriptionKey: 'model.gptMini',
+    description: 'Fast and free to use - perfect for daily tasks',
     icon: Zap,
     tier: 'Free',
     color: 'from-emerald-500 to-teal-500',
@@ -15,7 +14,7 @@ const models = [
   {
     id: 'gemini_3_flash',
     name: 'Gemini 3 Flash',
-    descriptionKey: 'model.gemini',
+    description: 'Fast with web search and multimodal understanding',
     icon: Sparkles,
     tier: 'Free',
     color: 'from-blue-500 to-cyan-500',
@@ -23,7 +22,7 @@ const models = [
   {
     id: 'gpt_5_4',
     name: 'GPT-5.4',
-    descriptionKey: 'model.gptAdvanced',
+    description: 'Stronger reasoning and deeper analysis - free in SnapTrainer',
     icon: Brain,
     tier: 'Free',
     color: 'from-violet-500 to-purple-500',
@@ -31,7 +30,7 @@ const models = [
   {
     id: 'claude_sonnet_4_6',
     name: 'Claude Sonnet',
-    descriptionKey: 'model.claudeSonnet',
+    description: 'Excellent for writing, code and nuanced answers - free',
     icon: Gem,
     tier: 'Free',
     color: 'from-orange-500 to-amber-500',
@@ -39,7 +38,7 @@ const models = [
   {
     id: 'claude_opus_4_6',
     name: 'Claude Opus',
-    descriptionKey: 'model.claudeOpus',
+    description: 'Powerful model for complex, creative tasks - free',
     icon: Crown,
     tier: 'Free',
     color: 'from-rose-500 to-pink-500',
@@ -47,16 +46,14 @@ const models = [
 ];
 
 export default function ModelSelector({ selected, onSelect }) {
-  const { t } = useLanguage();
-
   return (
     <div className="grid gap-3">
       <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-3">
         <HeartHandshake className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm font-medium">{t('model.freeTitle')}</p>
+          <p className="text-sm font-medium">All models are free to use</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {t('model.freeText')}
+            SnapTrainer is open source and funded by voluntary donations - not model paywalls.
           </p>
         </div>
       </div>
@@ -86,7 +83,7 @@ export default function ModelSelector({ selected, onSelect }) {
                   {model.tier}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">{t(model.descriptionKey)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{model.description}</p>
             </div>
             <div className={cn(
               "w-5 h-5 rounded-full border-2 shrink-0 transition-all",

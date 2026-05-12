@@ -4,11 +4,9 @@ import { Button } from '@/components/ui/button';
 import { GitBranch, Plus, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DonationButton from '@/components/DonationButton';
-import { useLanguage } from '@/lib/i18n';
+import { openSourceMessage } from '@/lib/donations';
 
 export default function EmptyState() {
-  const { t } = useLanguage();
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -23,18 +21,18 @@ export default function EmptyState() {
         <GitBranch className="w-3.5 h-3.5" />
         SnapTrainer
       </div>
-      <h2 className="text-2xl font-bold mb-2">{t('empty.title')}</h2>
+      <h2 className="text-2xl font-bold mb-2">Train your first AI identity</h2>
       <p className="text-muted-foreground text-center max-w-md mb-8">
-        {t('empty.text')}
+        Create an AIFace that learns your style and can use an invisible team of specialist agents for more complex tasks.
       </p>
       <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-center max-w-lg mb-6">
-        <p className="text-sm text-muted-foreground">{t('donation.message')}</p>
+        <p className="text-sm text-muted-foreground">{openSourceMessage}</p>
       </div>
       <div className="flex flex-wrap justify-center gap-3">
         <Link to="/create">
           <Button size="lg" className="gap-2 shadow-lg shadow-primary/25">
             <Plus className="w-5 h-5" />
-            {t('empty.cta')}
+            Create your first AIFace
           </Button>
         </Link>
         <DonationButton size="lg" />
