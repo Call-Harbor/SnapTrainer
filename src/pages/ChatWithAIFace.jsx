@@ -103,8 +103,12 @@ export default function ChatWithAIFace() {
       .map(f => f.feedback_text);
     if (styleHints.length > 0) parts.push(`Stilhints fra brugeren:\n- ${styleHints.join('\n- ')}`);
 
-    const summaries = knowledgeItems.filter(k => k.extracted_summary).map(k => k.extracted_summary);
-    if (summaries.length > 0) parts.push(`Kontekst fra brugerens filer:\n${summaries.join('\n\n')}`);
+    const summaries = knowledgeItems
+      .filter(k => k.extracted_summary || k.training_text)
+      .map(k => k.extracted_summary || k.training_text);
+    if (summaries.length > 0) {
+      parts.push(`Kontekst fra brugerens videnkilder, filer, URL-crawl instruktioner og FAQ-træning:\n${summaries.join('\n\n')}`);
+    }
 
     return parts.join('\n\n');
   };

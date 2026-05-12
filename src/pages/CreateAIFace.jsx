@@ -11,7 +11,14 @@ import ModelSelector from '@/components/create/ModelSelector';
 import StylePreferences from '@/components/create/StylePreferences';
 import FileUploader from '@/components/create/FileUploader';
 import AdvancedTrainingPanel from '@/components/create/AdvancedTrainingPanel';
+import WebKnowledgeTrainer from '@/components/create/WebKnowledgeTrainer';
 import { defaultAdvancedTrainingConfig, summarizeAdvancedTrainingForPrompt } from '@/lib/advanced-training';
+import {
+  buildFaqSummary,
+  buildWebSourceSummary,
+  getValidFaqItems,
+  getValidWebSources,
+} from '@/lib/knowledge-sources';
 
 const roles = [
   'Business advisor',
@@ -27,7 +34,7 @@ const steps = [
   { title: 'Vælg model', subtitle: 'Vælg den AI-motor der passer dig' },
   { title: 'Stilpræferencer', subtitle: 'Fortæl hvordan din AI skal kommunikere' },
   { title: 'Avanceret træning', subtitle: 'Valgfrit ekspertlag for AI/ML-specialister' },
-  { title: 'Upload materiale', subtitle: 'Giv din AI kontekst og viden' },
+  { title: 'Knowledge sources', subtitle: 'Upload filer, crawl URLer og tilføj FAQer' },
 ];
 
 export default function CreateAIFace() {
@@ -44,6 +51,8 @@ export default function CreateAIFace() {
   });
   const [advancedTraining, setAdvancedTraining] = useState(defaultAdvancedTrainingConfig);
   const [files, setFiles] = useState([]);
+  const [webSources, setWebSources] = useState([]);
+  const [faqItems, setFaqItems] = useState([]);
 
   const canNext = () => {
     if (step === 0) return name.trim().length > 0;
@@ -64,20 +73,24 @@ export default function CreateAIFace() {
     const advancedTrainingSummary = summarizeAdvancedTrainingForPrompt(advancedTraining);
     if (advancedTrainingSummary) identityParts.push(advancedTrainingSummary);
 
+    const validWebSources = getValidWebSources(webSources);
+    const validFaqItems = getValidFaqItems(faqItems);
+    const totalKnowledgeItems = files.length + validWebSources.length + validFaqItems.length;
+
     const face = await base44.entities.AIFace.create({
       name,
       model,
       role,
-      status: files.length > 0 ? 'training' : 'ready',
+      status: totalKnowledgeItems > 0 ? 'training' : 'ready',
       identity_prompt: identityParts.join('\n'),
       style_preferences: { ...preferences, role },
       advanced_training: advancedTraining,
-      total_files: files.length,
+      total_files: totalKnowledgeItems,
     });
 
-    // Upload files
-    if (files.length > 0) {
+    if (totalKnowledgeItems > 0) {
       setUploading(true);
+
       for (const item of files) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: item.file });
         await base44.entities.KnowledgeItem.create({
@@ -89,11 +102,47 @@ export default function CreateAIFace() {
         });
       }
 
-      // Process files with AI to build knowledge summary
-      const summaryPrompt = `Du er en AI-assistent der analyserer uploadede filer for at opbygge en brugerprofil. 
-Filerne er: ${files.map(f => f.file.name).join(', ')}. 
+      for (const source of validWebSources) {
+        const summary = buildWebSourceSummary(source);
+        await base44.entities.KnowledgeItem.create({
+          aiface_id: face.id,
+          file_name: source.url,
+          file_url: source.url,
+          file_type: source.crawl_mode === 'sitemap' ? 'sitemap' : 'url',
+          source_url: source.url,
+          crawl_mode: source.crawl_mode,
+          crawl_depth: source.crawl_depth,
+          include_patterns: source.include_patterns,
+          exclude_patterns: source.exclude_patterns,
+          tags: source.notes,
+          training_text: summary,
+          extracted_summary: summary,
+          status: 'ready',
+        });
+      }
+
+      for (const item of validFaqItems) {
+        const summary = buildFaqSummary(item);
+        await base44.entities.KnowledgeItem.create({
+          aiface_id: face.id,
+          file_name: item.question.slice(0, 80),
+          file_url: `faq:${item.question.slice(0, 80)}`,
+          file_type: 'faq',
+          question: item.question,
+          answer: item.answer,
+          tags: item.tags,
+          training_text: summary,
+          extracted_summary: summary,
+          status: 'ready',
+        });
+      }
+
+      const summaryPrompt = `Du er en AI-assistent der analyserer brugerens træningskilder for at opbygge en brugerprofil.
+Filerne er: ${files.map(f => f.file.name).join(', ') || 'ingen'}.
+Webkilder er: ${validWebSources.map(source => source.url).join(', ') || 'ingen'}.
+FAQ-træning: ${validFaqItems.length} FAQ-par.
 Brugeren foretrækker: ${identityParts.join(', ')}. 
-Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om brugerens stil og behov.`;
+Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om brugerens stil, videnkilder og behov.`;
 
       const summary = await base44.integrations.Core.InvokeLLM({ prompt: summaryPrompt });
       await base44.entities.AIFace.update(face.id, {
@@ -196,8 +245,15 @@ Skriv en kort opsummering (2-3 sætninger) af hvad denne AI-agent har lært om b
             {step === 4 && (
               <div className="space-y-4">
                 <FileUploader files={files} onFilesChange={setFiles} uploading={uploading} />
+                <WebKnowledgeTrainer
+                  webSources={webSources}
+                  onWebSourcesChange={setWebSources}
+                  faqItems={faqItems}
+                  onFaqItemsChange={setFaqItems}
+                  disabled={uploading}
+                />
                 <p className="text-xs text-muted-foreground">
-                  Du kan altid uploade flere filer senere. SnapTrainer bruger materialet til at gøre dit AIFace mere præcist over tid.
+                  Du kan altid tilføje flere filer, URL'er og FAQ'er senere. SnapTrainer bruger materialet i AIFacets knowledge sweep.
                 </p>
               </div>
             )}
