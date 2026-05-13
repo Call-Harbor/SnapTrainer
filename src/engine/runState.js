@@ -9,6 +9,9 @@ export const InterpretedIntentSchema = z.object({
   complexity: z.enum(['low', 'medium', 'high']),
   confidence: z.number().min(0).max(1),
   constraints: z.array(z.string()).default([]),
+  normalizedGoal: z.string().optional().default(''),
+  repairedGoal: z.string().optional().default(''),
+  promptQuality: z.enum(['clear', 'noisy_repaired']).optional().default('clear'),
 });
 
 export const SubtaskStateSchema = z.object({
@@ -131,6 +134,9 @@ export function createInitialRunState({ userGoal, userId = null, sessionId = nul
       complexity: 'low',
       confidence: 0,
       constraints: [],
+      normalizedGoal: '',
+      repairedGoal: '',
+      promptQuality: 'clear',
     },
     executionMode: EXECUTION_MODES.DIRECT,
     status: RUN_STATUSES.CREATED,

@@ -1,17 +1,42 @@
 import { EXECUTION_MODES } from './contracts.js';
 import { validateEvaluationResult } from './validation.js';
 
+const intentStopWords = new Set([
+  'about', 'after', 'before', 'could', 'from', 'have', 'into', 'just', 'make',
+  'need', 'please', 'should', 'that', 'their', 'then', 'there', 'this', 'user',
+  'what', 'when', 'where', 'with', 'would', 'your',
+]);
+
+function normalizeForMatch(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'o')
+    .replace(/å/g, 'a')
+    .replace(/[^a-z0-9\s-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function goalTermsFor(runState) {
+  const intent = runState.interpretedIntent || {};
+  const source = intent.repairedGoal || intent.normalizedGoal || runState.userGoal;
+  return normalizeForMatch(source)
+    .split(/\s+/)
+    .filter((word) => word.length > 4 && !intentStopWords.has(word))
+    .slice(0, 12);
+}
+
 function scoreIntentMatch(runState, finalOutput) {
   if (runState.interpretedIntent.needsClarification) {
     return finalOutput.includes('?') ? 0.85 : 0.35;
   }
-  const goalTerms = runState.userGoal
-    .toLowerCase()
-    .split(/\W+/)
-    .filter((word) => word.length > 4)
-    .slice(0, 12);
+  const goalTerms = goalTermsFor(runState);
   if (goalTerms.length === 0) return 0.65;
-  const matched = goalTerms.filter((word) => finalOutput.toLowerCase().includes(word)).length;
+  const normalizedOutput = normalizeForMatch(finalOutput);
+  const matched = goalTerms.filter((word) => normalizedOutput.includes(word)).length;
   return Math.min(1, 0.45 + matched / goalTerms.length);
 }
 

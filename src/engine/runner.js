@@ -120,6 +120,10 @@ async function synthesizeFinal({ runState, invokeLLM, telemetry }) {
 User goal:
 ${runState.userGoal}
 
+Interpreted intent:
+${runState.interpretedIntent.summary}
+${runState.interpretedIntent.repairedGoal ? `Repaired wording: ${runState.interpretedIntent.repairedGoal}` : ''}
+
 Structured intermediate outputs:
 ${aggregate}
 
