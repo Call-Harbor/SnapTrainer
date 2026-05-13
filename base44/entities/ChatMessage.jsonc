@@ -6,6 +6,22 @@
       "type": "string",
       "description": "Reference to the AIFace"
     },
+    "owner_user_id": {
+      "type": "string",
+      "description": "User ID that created this message"
+    },
+    "owner_email": {
+      "type": "string",
+      "description": "Email that created this message"
+    },
+    "aiface_owner_user_id": {
+      "type": "string",
+      "description": "Owner of the AIFace at message creation time"
+    },
+    "aiface_owner_email": {
+      "type": "string",
+      "description": "Owner email of the AIFace at message creation time"
+    },
     "role": {
       "type": "string",
       "enum": [

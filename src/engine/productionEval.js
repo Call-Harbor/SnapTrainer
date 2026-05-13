@@ -1,7 +1,9 @@
-export function buildProductionEvalRecord({ aifaceId, runState, evaluation }) {
+export function buildProductionEvalRecord({ aifaceId, ownerFields = {}, aifaceOwnerFields = {}, runState, evaluation }) {
   if (!evaluation) return null;
   return {
     aiface_id: aifaceId,
+    ...ownerFields,
+    ...aifaceOwnerFields,
     run_id: runState.runId,
     suite: 'production',
     case_id: runState.interpretedIntent.goalType,

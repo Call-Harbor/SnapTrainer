@@ -20,6 +20,8 @@ import {
   getValidWebSources,
 } from '@/lib/knowledge-sources';
 import { crawlWebSource, summarizeCrawl } from '@/services/webCrawler';
+import { useAuth } from '@/lib/AuthContext';
+import { getOwnerFields } from '@/lib/ownership';
 
 const roles = [
   'Business advisor',
@@ -32,6 +34,7 @@ const roles = [
 
 export default function CreateAIFace() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -77,11 +80,16 @@ export default function CreateAIFace() {
     const validWebSources = getValidWebSources(webSources);
     const validFaqItems = getValidFaqItems(faqItems);
     const totalKnowledgeItems = files.length + validWebSources.length + validFaqItems.length;
+    const ownerFields = getOwnerFields(user);
 
     const face = await base44.entities.AIFace.create({
       name,
       model,
       role,
+      ...ownerFields,
+      visibility: 'private',
+      shared_with_emails: [],
+      shared_with_user_ids: [],
       status: totalKnowledgeItems > 0 ? 'training' : 'ready',
       identity_prompt: identityParts.join('\n'),
       style_preferences: { ...preferences, role },
@@ -96,6 +104,7 @@ export default function CreateAIFace() {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: item.file });
         await base44.entities.KnowledgeItem.create({
           aiface_id: face.id,
+          ...ownerFields,
           file_name: item.file.name,
           file_url,
           file_type: item.type,
@@ -117,6 +126,7 @@ export default function CreateAIFace() {
           : `${buildWebSourceSummary(source)}\n\nCrawler status: ${crawlResult.error}`;
         await base44.entities.KnowledgeItem.create({
           aiface_id: face.id,
+          ...ownerFields,
           file_name: source.url,
           file_url: source.url,
           file_type: source.crawl_mode === 'sitemap' ? 'sitemap' : 'url',
@@ -137,6 +147,7 @@ export default function CreateAIFace() {
         const summary = buildFaqSummary(item);
         await base44.entities.KnowledgeItem.create({
           aiface_id: face.id,
+          ...ownerFields,
           file_name: item.question.slice(0, 80),
           file_url: `faq:${item.question.slice(0, 80)}`,
           file_type: 'faq',
