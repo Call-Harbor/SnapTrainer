@@ -135,7 +135,7 @@ function editDistance(a, b) {
 }
 
 function maxDistanceFor(term) {
-  if (term.length <= 3) return 0;
+  if (term.length <= 4) return 0;
   if (term.length <= 5) return 1;
   return 2;
 }
@@ -150,6 +150,7 @@ function wordMatches(candidate, expected) {
   const repairedExpected = repairToken(expected);
   if (repairedCandidate === repairedExpected) return true;
   if (candidate.length <= 2 || expected.length <= 2) return false;
+  if (Math.abs(repairedCandidate.length - repairedExpected.length) > 1) return false;
   return editDistance(repairedCandidate, repairedExpected) <= maxDistanceFor(repairedExpected);
 }
 
