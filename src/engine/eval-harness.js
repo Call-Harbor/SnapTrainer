@@ -28,6 +28,38 @@ const cases = [
     expected: { needsClarification: false, statusNot: 'needs_clarification' },
   },
   {
+    id: 'typo_heavy_action_prompt',
+    goal: 'plz rite lanch twet fr my ai face, mak it punchy',
+    expected: {
+      needsClarification: false,
+      statusNot: 'needs_clarification',
+      constraint: 'noisy_prompt_repaired',
+      goalType: 'content_generation',
+      repairedIncludes: 'write launch tweet',
+    },
+  },
+  {
+    id: 'danish_bad_prompt',
+    goal: 'Gør Motoren bag SnapTrainer endnu bedere til ekstramt dårlige promts',
+    expected: {
+      needsClarification: false,
+      statusNot: 'needs_clarification',
+      constraint: 'noisy_prompt_repaired',
+      goalType: 'improvement_or_repair',
+      repairedIncludes: 'make engine',
+    },
+  },
+  {
+    id: 'compressed_improvement_prompt',
+    goal: 'mk ths btr pls',
+    expected: {
+      needsClarification: false,
+      statusNot: 'needs_clarification',
+      constraint: 'noisy_prompt_repaired',
+      repairedIncludes: 'make this better',
+    },
+  },
+  {
     id: 'normal_question',
     goal: 'What is the best way to train an AIFace with FAQs?',
     expected: { needsClarification: false, statusNot: 'needs_clarification' },
@@ -58,6 +90,11 @@ const cases = [
     goal: 'Do it',
     expected: { needsClarification: true },
   },
+  {
+    id: 'unrepairable_nonsense',
+    goal: 'asdf qwer',
+    expected: { needsClarification: true },
+  },
 ];
 
 async function mockInvokeLLM({ prompt, agentId }) {
@@ -79,6 +116,12 @@ function scoreCase(runState, expected) {
   }
   if (expected.constraint) {
     checks.push(runState.interpretedIntent.constraints.includes(expected.constraint));
+  }
+  if (expected.goalType) {
+    checks.push(runState.interpretedIntent.goalType === expected.goalType);
+  }
+  if (expected.repairedIncludes) {
+    checks.push(runState.interpretedIntent.repairedGoal.includes(expected.repairedIncludes));
   }
   if (expected.complexity) {
     checks.push(runState.interpretedIntent.complexity === expected.complexity);
