@@ -115,10 +115,32 @@ async function synthesizeFinal({ runState, invokeLLM, telemetry }) {
   const aggregate = aggregateOutputs(runState);
   if (runState.interpretedIntent.needsClarification) return aggregate;
 
+  const quality = runState.interpretedIntent.inputQuality;
+  const qualityNotes = [];
+  if (quality?.corrections?.length) {
+    qualityNotes.push(
+      `Auto-corrected typos: ${quality.corrections.map((c) => `"${c.from}" -> "${c.to}"`).join(', ')}.`,
+    );
+  }
+  if (quality?.translations?.length) {
+    qualityNotes.push(
+      `Translated Danish input terms: ${quality.translations.map((t) => `"${t.from}" -> "${t.to}"`).join(', ')}.`,
+    );
+  }
+  if (quality?.isUltraVague) {
+    qualityNotes.push('The original request was very short; take a reasonable best-effort interpretation and state the assumptions you made.');
+  }
+  if (quality?.language === 'danish' || quality?.language === 'mixed') {
+    qualityNotes.push('The user input was written in Danish or mixed Danish/English; respond in the language the user used.');
+  }
+  const qualitySection = qualityNotes.length > 0
+    ? `\n\nInput quality notes (from preprocessing):\n${qualityNotes.map((n) => `- ${n}`).join('\n')}`
+    : '';
+
   const prompt = `${runState.boundaries.systemInstructions.join('\n')}
 
 User goal:
-${runState.userGoal}
+${runState.userGoal}${qualitySection}
 
 Structured intermediate outputs:
 ${aggregate}
@@ -176,6 +198,21 @@ export async function executeSnapTrainerRun({
   runState.executionMode = plan.executionMode;
   runState.clarificationNeeded = plan.interpretedIntent.needsClarification;
   runState.clarificationQuestion = plan.interpretedIntent.clarificationQuestion || '';
+  if (plan.preprocessing && (plan.preprocessing.hints.length > 0 || plan.preprocessing.qualityScore < 1)) {
+    telemetry.record({
+      stage: 'plan',
+      type: ENGINE_EVENT_TYPES.INTENT_INTERPRETED,
+      message: 'Input preprocessing applied',
+      data: {
+        qualityScore: plan.preprocessing.qualityScore,
+        language: plan.preprocessing.language,
+        corrections: plan.preprocessing.corrections.length,
+        translations: plan.preprocessing.translations.length,
+        hints: plan.preprocessing.hints,
+        isUltraVague: plan.preprocessing.isUltraVague,
+      },
+    });
+  }
   addSubtasks(runState, plan.subtasks, telemetry);
   addRoutingDecision(runState, {
     executionMode: plan.executionMode,

@@ -1,6 +1,15 @@
 import { z } from 'zod';
 import { EXECUTION_MODES, RUN_STAGES, RUN_STATUSES } from './executionModes.js';
 
+export const InputQualitySchema = z.object({
+  score: z.number().min(0).max(1).default(1),
+  language: z.string().default('english'),
+  corrections: z.array(z.object({ from: z.string(), to: z.string() })).default([]),
+  translations: z.array(z.object({ from: z.string(), to: z.string() })).default([]),
+  isUltraVague: z.boolean().default(false),
+  hints: z.array(z.string()).default([]),
+});
+
 export const InterpretedIntentSchema = z.object({
   summary: z.string(),
   goalType: z.string(),
@@ -9,6 +18,7 @@ export const InterpretedIntentSchema = z.object({
   complexity: z.enum(['low', 'medium', 'high']),
   confidence: z.number().min(0).max(1),
   constraints: z.array(z.string()).default([]),
+  inputQuality: InputQualitySchema.optional(),
 });
 
 export const SubtaskStateSchema = z.object({
