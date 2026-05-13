@@ -1,4 +1,5 @@
 import { EXECUTION_MODES } from './contracts.js';
+import { preprocessPrompt } from './promptPreprocessor.js';
 
 const signals = {
   multiStep: ['plan', 'roadmap', 'step', 'workflow', 'sequence', 'first', 'then', 'after'],
@@ -18,23 +19,35 @@ function includesAny(text, items) {
   return items.some((item) => text.includes(item));
 }
 
-export function interpretIntent(userGoal, memory) {
-  const text = userGoal.toLowerCase();
-  const trimmed = userGoal.trim();
+export function interpretIntent(userGoal, memory, preprocessed = null) {
+  const preprocessing = preprocessed || preprocessPrompt(userGoal);
+  const normalizedGoal = preprocessing.normalized || userGoal;
+  const text = normalizedGoal.toLowerCase();
+  const trimmed = normalizedGoal.trim();
   const constraints = [];
   if (includesAny(text, signals.conflict)) constraints.push('conflicting_instructions');
   if (includesAny(text, signals.highRisk)) constraints.push('high_risk_or_sensitive');
   if (memory.workflow.knowledgeCount > 0 || includesAny(text, signals.memory)) constraints.push('memory_dependent');
+  if (preprocessing.language === 'danish' || preprocessing.language === 'mixed') {
+    constraints.push('non_english_input');
+  }
+  if (preprocessing.corrections.length > 0 || preprocessing.translations.length > 0) {
+    constraints.push('low_quality_input_normalized');
+  }
 
   const isConversational = signals.conversational.includes(text.trim().replace(/[.!?]+$/, ''));
   const hasActionableSignal = includesAny(text, signals.actionable)
     || includesAny(text, signals.multiStep)
     || includesAny(text, signals.parallel)
+    || preprocessing.isQuestion
     || text.includes('?');
 
-  // Only ask for clarification if the message is extremely short (1-2 words) AND has no actionable signal
+  // Only ask for clarification if the message is extremely short (1-2 words) AND has no actionable signal.
+  // We trust the preprocessor's vagueness signal: if it auto-translated/corrected the input we treat the
+  // normalized form as good enough rather than escalating to a clarification dialog.
   const needsClarification =
     !isConversational &&
+    preprocessing.isUltraVague &&
     trimmed.split(/\s+/).length <= 2 &&
     !hasActionableSignal &&
     trimmed.length < 12;
@@ -47,16 +60,25 @@ export function interpretIntent(userGoal, memory) {
     includesAny(text, signals.highRisk),
   ].filter(Boolean).length;
 
-  const complexity = userGoal.length > 360 || signalCount >= 3
+  const complexity = normalizedGoal.length > 360 || signalCount >= 3
     ? 'high'
-    : userGoal.length > 140 || signalCount >= 2
+    : normalizedGoal.length > 140 || signalCount >= 2
       ? 'medium'
       : 'low';
+
+  const baseConfidence = needsClarification
+    ? 0.45
+    : complexity === 'high'
+      ? 0.72
+      : 0.82;
+  // Reduce confidence when input quality is poor, but never below the
+  // clarification floor — the engine should still attempt an answer.
+  const confidence = Math.max(0.45, Number((baseConfidence * (0.6 + 0.4 * preprocessing.qualityScore)).toFixed(2)));
 
   return {
     summary: needsClarification
       ? 'The request is underspecified and may require clarification.'
-      : `The user wants: ${userGoal.slice(0, 180)}`,
+      : `The user wants: ${normalizedGoal.slice(0, 180)}`,
     goalType: includesAny(text, signals.multiStep)
       ? 'workflow'
       : includesAny(text, signals.parallel)
@@ -69,8 +91,16 @@ export function interpretIntent(userGoal, memory) {
       ? 'Can you share the intended outcome, audience, and any constraints before I proceed?'
       : '',
     complexity,
-    confidence: needsClarification ? 0.45 : complexity === 'high' ? 0.72 : 0.82,
+    confidence,
     constraints,
+    inputQuality: {
+      score: preprocessing.qualityScore,
+      language: preprocessing.language,
+      corrections: preprocessing.corrections,
+      translations: preprocessing.translations,
+      isUltraVague: preprocessing.isUltraVague,
+      hints: preprocessing.hints,
+    },
   };
 }
 
@@ -243,8 +273,10 @@ export function decomposeTask(userGoal, intent, executionMode) {
 }
 
 export function buildPlan({ userGoal, memory }) {
-  const interpretedIntent = interpretIntent(userGoal, memory);
-  const executionMode = chooseExecutionMode(interpretedIntent, userGoal);
-  const subtasks = decomposeTask(userGoal, interpretedIntent, executionMode);
-  return { interpretedIntent, executionMode, subtasks };
+  const preprocessing = preprocessPrompt(userGoal);
+  const goalForPlanning = preprocessing.enrichedGoal || userGoal;
+  const interpretedIntent = interpretIntent(userGoal, memory, preprocessing);
+  const executionMode = chooseExecutionMode(interpretedIntent, preprocessing.normalized || userGoal);
+  const subtasks = decomposeTask(goalForPlanning, interpretedIntent, executionMode);
+  return { interpretedIntent, executionMode, subtasks, preprocessing };
 }

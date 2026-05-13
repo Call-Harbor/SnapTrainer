@@ -58,6 +58,26 @@ const cases = [
     goal: 'Do it',
     expected: { needsClarification: true },
   },
+  {
+    id: 'danish_prompt',
+    goal: 'Skriv et kort opslag om vores lancering',
+    expected: { needsClarification: false, statusNot: 'needs_clarification', inputLanguage: 'danish' },
+  },
+  {
+    id: 'misspelled_prompt',
+    goal: 'pls help me draft teh launch annoucement, thx',
+    expected: { needsClarification: false, statusNot: 'needs_clarification', hasCorrections: true },
+  },
+  {
+    id: 'mixed_language_prompt',
+    goal: 'Jeg vil have hjælp til at write a short product description',
+    expected: { needsClarification: false, statusNot: 'needs_clarification', hasTranslations: true },
+  },
+  {
+    id: 'vague_danish_prompt',
+    goal: 'fix det',
+    expected: { needsClarification: true },
+  },
 ];
 
 async function mockInvokeLLM({ prompt, agentId }) {
@@ -88,6 +108,15 @@ function scoreCase(runState, expected) {
   }
   if (expected.statusNot) {
     checks.push(runState.status !== expected.statusNot);
+  }
+  if (expected.inputLanguage) {
+    checks.push(runState.interpretedIntent.inputQuality?.language === expected.inputLanguage);
+  }
+  if (expected.hasCorrections) {
+    checks.push((runState.interpretedIntent.inputQuality?.corrections?.length || 0) > 0);
+  }
+  if (expected.hasTranslations) {
+    checks.push((runState.interpretedIntent.inputQuality?.translations?.length || 0) > 0);
   }
 
   return {
