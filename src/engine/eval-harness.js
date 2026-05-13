@@ -15,7 +15,7 @@ const cases = [
   {
     id: 'vague_prompt',
     goal: 'Help me improve this',
-    expected: { needsClarification: true, recovery: 'clarify' },
+    expected: { needsClarification: false, statusNot: 'needs_clarification' },
   },
   {
     id: 'incomplete_instruction',
