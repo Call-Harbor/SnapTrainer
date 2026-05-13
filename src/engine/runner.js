@@ -249,7 +249,7 @@ export async function executeSnapTrainerRun({
 
     if (recovery.action === 'clarify') {
       runState.status = RUN_STATUSES.NEEDS_CLARIFICATION;
-      runState.finalResult = runState.interpretedIntent.clarificationQuestion;
+      setFinalOutput(runState, runState.interpretedIntent.clarificationQuestion);
     } else if (recovery.action === 'retry' && recovery.targetSubtaskId) {
       const target = runState.subtasks.find((task) => task.id === recovery.targetSubtaskId);
       if (target) {
