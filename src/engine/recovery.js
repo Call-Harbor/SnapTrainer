@@ -5,10 +5,18 @@ export function decideRecovery(runState, evaluation) {
   if (evaluation.passed) return { action: 'accept' };
 
   const hasRetry = runState.retries.length > 0;
-  if (evaluation.recommendedAction === 'clarify') {
+  if (evaluation.recommendedAction === 'clarify' && runState.interpretedIntent.needsClarification) {
     return {
       action: 'clarify',
       reason: evaluation.notes.join(' '),
+    };
+  }
+
+  if (evaluation.recommendedAction === 'clarify') {
+    return {
+      action: hasRetry ? 'fallback' : 'retry',
+      targetSubtaskId: [...runState.subtasks].reverse().find((task) => task.status === 'completed')?.id,
+      reason: 'Clarification was requested by evaluator, but interpreted intent is actionable; retrying/falling back instead.',
     };
   }
 

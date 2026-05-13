@@ -69,9 +69,12 @@ export function evaluateRun(runState, finalOutput) {
   result.passed = result.overall >= threshold;
 
   if (!result.passed) {
-    if (runState.interpretedIntent.needsClarification || result.intentMatch < 0.5) {
+    if (runState.interpretedIntent.needsClarification) {
       result.recommendedAction = 'clarify';
-      result.notes.push('Intent match is too low; ask for clarification.');
+      result.notes.push('Intent is underspecified; ask for clarification.');
+    } else if (result.intentMatch < 0.5 && runState.executionMode !== EXECUTION_MODES.DIRECT) {
+      result.recommendedAction = 'reroute';
+      result.notes.push('Intent match is low; reroute through reviewer/synthesizer instead of asking a generic clarification.');
     } else if (result.completeness < 0.62) {
       result.recommendedAction = 'retry';
       result.notes.push('Completeness is too low; retry the weakest step.');

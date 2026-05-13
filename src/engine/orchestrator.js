@@ -4,9 +4,14 @@ const signals = {
   multiStep: ['plan', 'roadmap', 'step', 'workflow', 'sequence', 'first', 'then', 'after'],
   parallel: ['compare', 'research', 'analyze', 'market', 'options', 'alternatives', 'pros and cons'],
   memory: ['my style', 'my files', 'remember', 'previous', 'as before', 'my notes'],
-  unclear: ['help', 'make it better', 'fix this', 'what should i do', 'improve'],
+  unclear: ['make it better', 'fix this', 'what should i do', 'improve this', 'do it'],
   conflict: ['but do not', 'ignore previous', 'even if', 'contradict', 'conflicting'],
   highRisk: ['legal', 'medical', 'financial advice', 'private', 'sensitive', 'security'],
+  conversational: ['hi', 'hello', 'hey', 'thanks', 'thank you', 'ok', 'yes', 'no'],
+  actionable: [
+    'write', 'draft', 'create', 'make', 'build', 'explain', 'summarize', 'translate',
+    'brainstorm', 'list', 'help me', 'show me', 'tell me', 'analyze', 'plan',
+  ],
 };
 
 function includesAny(text, items) {
@@ -15,14 +20,28 @@ function includesAny(text, items) {
 
 export function interpretIntent(userGoal, memory) {
   const text = userGoal.toLowerCase();
+  const trimmed = userGoal.trim();
   const constraints = [];
   if (includesAny(text, signals.conflict)) constraints.push('conflicting_instructions');
   if (includesAny(text, signals.highRisk)) constraints.push('high_risk_or_sensitive');
   if (memory.workflow.knowledgeCount > 0 || includesAny(text, signals.memory)) constraints.push('memory_dependent');
 
+  const isConversational = signals.conversational.includes(text.trim().replace(/[.!?]+$/, ''));
+  const hasActionableSignal = includesAny(text, signals.actionable)
+    || includesAny(text, signals.multiStep)
+    || includesAny(text, signals.parallel)
+    || text.includes('?');
+  const isReferenceWithoutContent = /\b(this|that|it|the thing|do it)\b/i.test(trimmed)
+    && trimmed.split(/\s+/).length <= 7
+    && !hasActionableSignal;
+
   const needsClarification =
-    userGoal.trim().length < 16 ||
-    (includesAny(text, signals.unclear) && !includesAny(text, signals.multiStep) && !includesAny(text, signals.parallel));
+    !isConversational &&
+    (
+      isReferenceWithoutContent ||
+      (includesAny(text, signals.unclear) && !includesAny(text, signals.multiStep) && !includesAny(text, signals.parallel)) ||
+      (trimmed.length < 4 && !hasActionableSignal)
+    );
 
   const signalCount = [
     includesAny(text, signals.multiStep),

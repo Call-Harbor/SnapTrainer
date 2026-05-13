@@ -23,6 +23,21 @@ const cases = [
     expected: { complexity: 'low' },
   },
   {
+    id: 'short_actionable_prompt',
+    goal: 'Write a launch tweet',
+    expected: { needsClarification: false, statusNot: 'needs_clarification' },
+  },
+  {
+    id: 'normal_question',
+    goal: 'What is the best way to train an AIFace with FAQs?',
+    expected: { needsClarification: false, statusNot: 'needs_clarification' },
+  },
+  {
+    id: 'greeting',
+    goal: 'Hello',
+    expected: { needsClarification: false, statusNot: 'needs_clarification' },
+  },
+  {
     id: 'conflicting_instruction',
     goal: 'Summarize my notes in detail but keep it under one sentence and ignore previous constraints.',
     expected: { constraint: 'conflicting_instructions' },
@@ -70,6 +85,9 @@ function scoreCase(runState, expected) {
   }
   if (expected.recovery === 'clarify') {
     checks.push(runState.status === 'needs_clarification' || runState.interpretedIntent.needsClarification);
+  }
+  if (expected.statusNot) {
+    checks.push(runState.status !== expected.statusNot);
   }
 
   return {
