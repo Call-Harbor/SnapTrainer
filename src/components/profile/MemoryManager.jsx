@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Pin, Plus, Trash2 } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { getOwnerFields } from '@/lib/ownership';
 
 const emptyMemory = {
   memory_type: 'preference',
@@ -19,16 +21,19 @@ const emptyMemory = {
   pinned: false,
 };
 
-export default function MemoryManager({ aifaceId, memoryItems }) {
+export default function MemoryManager({ aifaceId, memoryItems, isOwner = false }) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState(emptyMemory);
   const [saving, setSaving] = useState(false);
 
   const saveMemory = async () => {
+    if (!isOwner) return;
     if (!draft.title.trim() || !draft.content.trim()) return;
     setSaving(true);
     await base44.entities.MemoryItem.create({
       aiface_id: aifaceId,
+      ...getOwnerFields(user),
       ...draft,
       status: 'active',
     });
@@ -38,11 +43,13 @@ export default function MemoryManager({ aifaceId, memoryItems }) {
   };
 
   const archiveMemory = async (item) => {
+    if (!isOwner) return;
     await base44.entities.MemoryItem.update(item.id, { status: 'archived' });
     queryClient.invalidateQueries({ queryKey: ['memory', aifaceId] });
   };
 
   const togglePinned = async (item) => {
+    if (!isOwner) return;
     await base44.entities.MemoryItem.update(item.id, { pinned: !item.pinned });
     queryClient.invalidateQueries({ queryKey: ['memory', aifaceId] });
   };
@@ -87,7 +94,7 @@ export default function MemoryManager({ aifaceId, memoryItems }) {
               placeholder="What should this AIFace remember long-term?"
             />
           </div>
-          <Button onClick={saveMemory} disabled={saving || !draft.title.trim() || !draft.content.trim()} className="gap-2">
+          <Button onClick={saveMemory} disabled={!isOwner || saving || !draft.title.trim() || !draft.content.trim()} className="gap-2">
             <Plus className="w-4 h-4" />
             Add memory
           </Button>
@@ -110,10 +117,10 @@ export default function MemoryManager({ aifaceId, memoryItems }) {
                   <p className="text-sm text-muted-foreground mt-1">{item.content}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => togglePinned(item)}>
+                  <Button variant="ghost" size="icon" disabled={!isOwner} onClick={() => togglePinned(item)}>
                     <Pin className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => archiveMemory(item)}>
+                  <Button variant="ghost" size="icon" disabled={!isOwner} onClick={() => archiveMemory(item)}>
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
                 </div>

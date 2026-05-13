@@ -6,6 +6,12 @@
       "type": "string",
       "description": "Reference to the AIFace"
     },
+    "owner_user_id": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
     "memory_type": {
       "type": "string",
       "enum": [

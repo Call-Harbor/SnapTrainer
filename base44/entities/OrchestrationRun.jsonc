@@ -6,6 +6,18 @@
       "type": "string",
       "description": "Reference to the AIFace"
     },
+    "owner_user_id": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "aiface_owner_user_id": {
+      "type": "string"
+    },
+    "aiface_owner_email": {
+      "type": "string"
+    },
     "session_id": {
       "type": "string",
       "description": "Conversation session this run belongs to"

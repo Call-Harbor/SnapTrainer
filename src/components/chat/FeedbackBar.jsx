@@ -4,8 +4,11 @@ import { Input } from '@/components/ui/input';
 import { ThumbsUp, ThumbsDown, MessageSquare, Send, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/AuthContext';
+import { getOwnerFields } from '@/lib/ownership';
 
-export default function FeedbackBar({ messageId, aifaceId }) {
+export default function FeedbackBar({ messageId, aifaceId, aifaceOwnerFields = {} }) {
+  const { user } = useAuth();
   const [showInput, setShowInput] = useState(false);
   const [text, setText] = useState('');
   const [submitted, setSubmitted] = useState(null);
@@ -13,6 +16,8 @@ export default function FeedbackBar({ messageId, aifaceId }) {
   const submitFeedback = async (type, feedbackText) => {
     await base44.entities.FeedbackEntry.create({
       aiface_id: aifaceId,
+      ...getOwnerFields(user),
+      ...aifaceOwnerFields,
       message_id: messageId,
       feedback_type: type,
       feedback_text: feedbackText || '',

@@ -6,19 +6,46 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Activity, AlertTriangle, CheckCircle2, Clock, GitBranch, ListChecks } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '@/lib/AuthContext';
+import { getUserEmail, getUserId } from '@/lib/ownership';
 
 export default function MissionControl() {
+  const { user } = useAuth();
   const [selectedRunId, setSelectedRunId] = useState(null);
   const { data: runs = [], isLoading } = useQuery({
-    queryKey: ['orchestration-runs'],
-    queryFn: () => base44.entities.OrchestrationRun ? base44.entities.OrchestrationRun.list('-created_date', 100) : [],
+    queryKey: ['orchestration-runs', user?.id, user?.email],
+    queryFn: async () => {
+      if (!base44.entities.OrchestrationRun) return [];
+      const allRuns = await base44.entities.OrchestrationRun.list('-created_date', 100);
+      const userId = getUserId(user);
+      const email = getUserEmail(user);
+      return allRuns.filter((run) =>
+        run.owner_user_id === userId ||
+        run.owner_email === email ||
+        run.aiface_owner_user_id === userId ||
+        run.aiface_owner_email === email
+      );
+    },
     initialData: [],
+    enabled: Boolean(user),
   });
 
   const { data: evalRuns = [] } = useQuery({
-    queryKey: ['eval-runs'],
-    queryFn: () => base44.entities.EvalRun ? base44.entities.EvalRun.list('-created_date', 100) : [],
+    queryKey: ['eval-runs', user?.id, user?.email],
+    queryFn: async () => {
+      if (!base44.entities.EvalRun) return [];
+      const allRuns = await base44.entities.EvalRun.list('-created_date', 100);
+      const userId = getUserId(user);
+      const email = getUserEmail(user);
+      return allRuns.filter((run) =>
+        run.owner_user_id === userId ||
+        run.owner_email === email ||
+        run.aiface_owner_user_id === userId ||
+        run.aiface_owner_email === email
+      );
+    },
     initialData: [],
+    enabled: Boolean(user),
   });
 
   const selectedRun = useMemo(

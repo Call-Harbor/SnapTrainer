@@ -10,7 +10,7 @@ import {
   ArrowLeft, Brain, FileText, MessageSquare, Settings,
   Trash2, Loader2, Image, Mic, Upload, Sparkles,
   ThumbsUp, ThumbsDown, GitBranch, PenLine, Search, ShieldCheck, Workflow, CheckCircle2,
-  Globe, HelpCircle,
+  Globe, HelpCircle, Share2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import FileUploader from '@/components/create/FileUploader';
@@ -33,6 +33,9 @@ import {
 import { crawlWebSource, summarizeCrawl } from '@/services/webCrawler';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import ExportPDFButton from '@/components/profile/ExportPDFButton';
+import ShareAIFacePanel from '@/components/profile/ShareAIFacePanel';
+import { useAuth } from '@/lib/AuthContext';
+import { canAccessAIFace, canEditAIFace, getOwnerFields } from '@/lib/ownership';
 
 const fileTypeIcons = {
   pdf: FileText,
@@ -95,6 +98,7 @@ export default function AIFaceProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [newFiles, setNewFiles] = useState([]);
   const [newWebSources, setNewWebSources] = useState([]);
@@ -105,8 +109,10 @@ export default function AIFaceProfile() {
     queryKey: ['aiface', id],
     queryFn: async () => {
       const faces = await base44.entities.AIFace.filter({ id });
-      return faces[0];
+      const face = faces[0];
+      return canAccessAIFace(face, user) ? face : null;
     },
+    enabled: Boolean(user),
   });
 
   const { data: knowledgeItems = [] } = useQuery({
@@ -142,6 +148,7 @@ export default function AIFaceProfile() {
   }, [face]);
 
   const handleSave = async () => {
+    if (!canEditAIFace(face, user)) return;
     setSaving(true);
 
     let identityParts = [];
@@ -166,13 +173,16 @@ export default function AIFaceProfile() {
   };
 
   const handleUploadMore = async () => {
+    if (!canEditAIFace(face, user)) return;
     if (newFiles.length === 0) return;
     setUploading(true);
+    const ownerFields = getOwnerFields(user);
 
     for (const item of newFiles) {
       const { file_url } = await base44.integrations.Core.UploadFile({ file: item.file });
       await base44.entities.KnowledgeItem.create({
         aiface_id: id,
+        ...ownerFields,
         file_name: item.file.name,
         file_url,
         file_type: item.type,
@@ -192,12 +202,14 @@ export default function AIFaceProfile() {
   };
 
   const handleAddWebKnowledge = async () => {
+    if (!canEditAIFace(face, user)) return;
     const validWebSources = getValidWebSources(newWebSources);
     const validFaqItems = getValidFaqItems(newFaqItems);
     const totalNewItems = validWebSources.length + validFaqItems.length;
     if (totalNewItems === 0) return;
 
     setUploading(true);
+    const ownerFields = getOwnerFields(user);
 
     for (const source of validWebSources) {
       const crawlResult = await crawlWebSource(source);
@@ -213,6 +225,7 @@ export default function AIFaceProfile() {
         : `${buildWebSourceSummary(source)}\n\nCrawler status: ${crawlResult.error}`;
       await base44.entities.KnowledgeItem.create({
         aiface_id: id,
+        ...ownerFields,
         file_name: source.url,
         file_url: source.url,
         file_type: source.crawl_mode === 'sitemap' ? 'sitemap' : 'url',
@@ -233,6 +246,7 @@ export default function AIFaceProfile() {
       const summary = buildFaqSummary(item);
       await base44.entities.KnowledgeItem.create({
         aiface_id: id,
+        ...ownerFields,
         file_name: item.question.slice(0, 80),
         file_url: `faq:${item.question.slice(0, 80)}`,
         file_type: 'faq',
@@ -258,6 +272,7 @@ export default function AIFaceProfile() {
   };
 
   const handleDelete = async () => {
+    if (!canEditAIFace(face, user)) return;
     await base44.entities.AIFace.delete(id);
     navigate('/app');
   };
@@ -273,6 +288,7 @@ export default function AIFaceProfile() {
   const thumbsUp = feedbackEntries.filter(f => f.feedback_type === 'thumbs_up').length;
   const thumbsDown = feedbackEntries.filter(f => f.feedback_type === 'thumbs_down').length;
   const hints = feedbackEntries.filter(f => f.feedback_type === 'style_hint' && f.feedback_text);
+  const isOwner = canEditAIFace(face, user);
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -358,7 +374,7 @@ export default function AIFaceProfile() {
       )}
 
       <Tabs defaultValue="settings" className="space-y-6">
-        <TabsList className="grid grid-cols-6">
+        <TabsList className="grid grid-cols-7">
           <TabsTrigger value="settings" className="gap-1.5">
             <Settings className="w-3.5 h-3.5" /> Settings
           </TabsTrigger>
@@ -376,6 +392,9 @@ export default function AIFaceProfile() {
           </TabsTrigger>
           <TabsTrigger value="feedback" className="gap-1.5">
             <Brain className="w-3.5 h-3.5" /> Adaptation
+          </TabsTrigger>
+          <TabsTrigger value="sharing" className="gap-1.5">
+            <Share2 className="w-3.5 h-3.5" /> Sharing
           </TabsTrigger>
         </TabsList>
 
@@ -567,7 +586,7 @@ export default function AIFaceProfile() {
         </TabsContent>
 
         <TabsContent value="memory" className="space-y-6">
-          <MemoryManager aifaceId={id} memoryItems={memoryItems} />
+          <MemoryManager aifaceId={id} memoryItems={memoryItems} isOwner={isOwner} />
         </TabsContent>
 
         <TabsContent value="feedback" className="space-y-6">
@@ -613,6 +632,10 @@ export default function AIFaceProfile() {
               <p className="text-sm">No feedback yet. Chat with your AIFace and give feedback to make it more personal.</p>
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="sharing" className="space-y-6">
+          <ShareAIFacePanel face={face} isOwner={isOwner} />
         </TabsContent>
       </Tabs>
     </div>

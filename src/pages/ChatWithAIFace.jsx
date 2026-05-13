@@ -13,6 +13,8 @@ import { executeSnapTrainerRun } from '@/engine/runner';
 import { runStateToActivityPlan, runStateToChatMetadata } from '@/engine/compat';
 import { resolveAgentModel } from '@/engine/agentRegistry';
 import { buildProductionEvalRecord } from '@/engine/productionEval';
+import { useAuth } from '@/lib/AuthContext';
+import { canAccessAIFace, getOwnerFields, getUserEmail, getUserId, isOwnedByUser } from '@/lib/ownership';
 
 function generateSessionId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -21,6 +23,7 @@ function generateSessionId() {
 export default function ChatWithAIFace() {
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const messagesEndRef = useRef(null);
   const [activeSessionId, setActiveSessionId] = useState(() => generateSessionId());
   const [sending, setSending] = useState(false);
@@ -31,15 +34,25 @@ export default function ChatWithAIFace() {
     queryKey: ['aiface', id],
     queryFn: async () => {
       const faces = await base44.entities.AIFace.filter({ id });
-      return faces[0];
+      const face = faces[0];
+      return canAccessAIFace(face, user) ? face : null;
     },
+    enabled: Boolean(user),
   });
 
   // Load ALL messages for this AIFace (all sessions)
   const { data: allMessages = [] } = useQuery({
-    queryKey: ['messages', id],
-    queryFn: () => base44.entities.ChatMessage.filter({ aiface_id: id }, '-created_date', 500),
+    queryKey: ['messages', id, user?.id, user?.email, face?.owner_user_id, face?.owner_email],
+    queryFn: async () => {
+      const messages = await base44.entities.ChatMessage.filter({ aiface_id: id }, '-created_date', 500);
+      if (!face) return [];
+      if (isOwnedByUser(face, user)) return messages;
+      const userId = getUserId(user);
+      const email = getUserEmail(user);
+      return messages.filter((message) => message.owner_user_id === userId || message.owner_email === email);
+    },
     initialData: [],
+    enabled: Boolean(user && face),
   });
 
   const { data: feedbackEntries = [] } = useQuery({
@@ -98,10 +111,17 @@ export default function ChatWithAIFace() {
 
   const handleSend = async (content) => {
     setSending(true);
+    const messageOwnerFields = getOwnerFields(user);
+    const aifaceOwnerFields = {
+      aiface_owner_user_id: face.owner_user_id || null,
+      aiface_owner_email: face.owner_email || null,
+    };
 
     try {
       await base44.entities.ChatMessage.create({
         aiface_id: id,
+        ...messageOwnerFields,
+        ...aifaceOwnerFields,
         role: 'user',
         content,
         session_id: activeSessionId,
@@ -131,7 +151,10 @@ export default function ChatWithAIFace() {
           await base44.entities.OrchestrationRun.create({
             aiface_id: id,
             session_id: activeSessionId,
-          user_id: null,
+          user_id: messageOwnerFields.owner_user_id,
+          owner_user_id: messageOwnerFields.owner_user_id,
+          owner_email: messageOwnerFields.owner_email,
+          ...aifaceOwnerFields,
             run_id: runResult.runState.runId,
             user_goal: content,
             status: runResult.runState.status,
@@ -155,6 +178,8 @@ export default function ChatWithAIFace() {
         if (base44.entities.EvalRun && runResult.evaluation) {
           await base44.entities.EvalRun.create(buildProductionEvalRecord({
             aifaceId: id,
+            ownerFields: messageOwnerFields,
+            aifaceOwnerFields,
             runState: runResult.runState,
             evaluation: runResult.evaluation,
           }));
@@ -165,6 +190,8 @@ export default function ChatWithAIFace() {
 
       await base44.entities.ChatMessage.create({
         aiface_id: id,
+        ...messageOwnerFields,
+        ...aifaceOwnerFields,
         role: 'assistant',
         content: runResult.finalOutput,
         session_id: activeSessionId,
@@ -178,6 +205,8 @@ export default function ChatWithAIFace() {
       console.error('SnapTrainer engine run failed', error);
       await base44.entities.ChatMessage.create({
         aiface_id: id,
+        ...messageOwnerFields,
+        ...aifaceOwnerFields,
         role: 'assistant',
         content: 'I could not complete this run reliably. Please try again or add more context so I can recover safely.',
         session_id: activeSessionId,
@@ -280,7 +309,14 @@ export default function ChatWithAIFace() {
             <div key={msg.id}>
               <ChatBubble message={msg} aiFaceName={face.name} />
               {msg.role === 'assistant' && (
-                <FeedbackBar messageId={msg.id} aifaceId={id} />
+                <FeedbackBar
+                  messageId={msg.id}
+                  aifaceId={id}
+                  aifaceOwnerFields={{
+                    aiface_owner_user_id: face.owner_user_id || null,
+                    aiface_owner_email: face.owner_email || null,
+                  }}
+                />
               )}
             </div>
           ))}

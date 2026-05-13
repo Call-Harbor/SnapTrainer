@@ -11,12 +11,19 @@ import { Brain, GitBranch, HeartHandshake, Plus, ShieldCheck, Sparkles } from 'l
 import { motion } from 'framer-motion';
 import DonationButton from '@/components/DonationButton';
 import { openSourceMessage } from '@/lib/donations';
+import { useAuth } from '@/lib/AuthContext';
+import { filterAccessibleAIFaces } from '@/lib/ownership';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { data: faces, isLoading } = useQuery({
-    queryKey: ['aifaces'],
-    queryFn: () => base44.entities.AIFace.list('-updated_date'),
+    queryKey: ['aifaces', user?.id, user?.email],
+    queryFn: async () => {
+      const allFaces = await base44.entities.AIFace.list('-updated_date');
+      return filterAccessibleAIFaces(allFaces, user);
+    },
     initialData: [],
+    enabled: Boolean(user),
   });
 
   if (isLoading) {

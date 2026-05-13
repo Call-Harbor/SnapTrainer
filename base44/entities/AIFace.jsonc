@@ -25,6 +25,36 @@
       "type": "string",
       "description": "The user's intended role for this personal AI identity"
     },
+    "owner_user_id": {
+      "type": "string",
+      "description": "User ID of the creator/owner"
+    },
+    "owner_email": {
+      "type": "string",
+      "description": "Email of the creator/owner"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "private",
+        "shared"
+      ],
+      "default": "private"
+    },
+    "shared_with_emails": {
+      "type": "array",
+      "description": "Emails that can access this AIFace",
+      "items": {
+        "type": "string"
+      }
+    },
+    "shared_with_user_ids": {
+      "type": "array",
+      "description": "User IDs that can access this AIFace",
+      "items": {
+        "type": "string"
+      }
+    },
     "status": {
       "type": "string",
       "enum": [
