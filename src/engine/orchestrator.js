@@ -31,17 +31,13 @@ export function interpretIntent(userGoal, memory) {
     || includesAny(text, signals.multiStep)
     || includesAny(text, signals.parallel)
     || text.includes('?');
-  const isReferenceWithoutContent = /\b(this|that|it|the thing|do it)\b/i.test(trimmed)
-    && trimmed.split(/\s+/).length <= 7
-    && !hasActionableSignal;
 
+  // Only ask for clarification if the message is extremely short (1-2 words) AND has no actionable signal
   const needsClarification =
     !isConversational &&
-    (
-      isReferenceWithoutContent ||
-      (includesAny(text, signals.unclear) && !includesAny(text, signals.multiStep) && !includesAny(text, signals.parallel)) ||
-      (trimmed.length < 4 && !hasActionableSignal)
-    );
+    trimmed.split(/\s+/).length <= 2 &&
+    !hasActionableSignal &&
+    trimmed.length < 12;
 
   const signalCount = [
     includesAny(text, signals.multiStep),
