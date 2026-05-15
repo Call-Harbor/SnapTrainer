@@ -4,49 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * SnapTrainer is dark-only.
+ * Both :root and .dark resolve to the same graphite/mint palette so
+ * any component that toggles the dark class still gets the brand look.
+ */
 @layer base {
-  :root {
+  :root,
+  .dark {
     --font-sans: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    /* Light theme — mint accent on graphite */
-    --background: 160 20% 98%;
-    --foreground: 220 18% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 18% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 18% 12%;
-    --primary: 152 56% 47%;
-    --primary-foreground: 220 18% 10%;
-    --secondary: 160 12% 94%;
-    --secondary-foreground: 220 18% 12%;
-    --muted: 160 12% 94%;
-    --muted-foreground: 220 9% 42%;
-    --accent: 158 64% 56%;
-    --accent-foreground: 220 18% 10%;
-    --destructive: 0 78% 56%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 88%;
-    --input: 220 13% 88%;
-    --ring: 152 56% 47%;
-    --chart-1: 152 56% 47%;
-    --chart-2: 158 64% 56%;
-    --chart-3: 199 80% 48%;
-    --chart-4: 220 14% 32%;
-    --chart-5: 38 92% 50%;
-    --radius: 0.75rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 18% 12%;
-    --sidebar-primary: 152 56% 47%;
-    --sidebar-primary-foreground: 220 18% 10%;
-    --sidebar-accent: 160 12% 94%;
-    --sidebar-accent-foreground: 220 18% 12%;
-    --sidebar-border: 220 13% 88%;
-    --sidebar-ring: 152 56% 47%;
-  }
-
-  .dark {
-    /* Dark theme — graphite from the logo diamond */
+    /* Dark theme — graphite from the logo diamond, mint accent */
     --background: 220 13% 8%;
     --foreground: 160 15% 92%;
     --card: 220 13% 11%;
@@ -71,6 +40,7 @@
     --chart-3: 199 80% 56%;
     --chart-4: 220 14% 70%;
     --chart-5: 38 92% 56%;
+    --radius: 0.75rem;
     --sidebar-background: 220 13% 11%;
     --sidebar-foreground: 160 15% 92%;
     --sidebar-primary: 152 56% 55%;
@@ -79,6 +49,8 @@
     --sidebar-accent-foreground: 160 15% 92%;
     --sidebar-border: 220 10% 20%;
     --sidebar-ring: 152 56% 55%;
+
+    color-scheme: dark;
   }
 }
 
