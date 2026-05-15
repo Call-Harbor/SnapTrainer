@@ -118,7 +118,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
                 <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  {['No model paywalls', 'English-only platform', 'Donation supported'].map((item) => (
+                  {['Plan → execute → review', 'Multi-agent orchestration', 'Inspectable run state'].map((item) => (
                     <span key={item} className="rounded-full border border-border/60 bg-card px-3 py-1">
                       {item}
                     </span>
