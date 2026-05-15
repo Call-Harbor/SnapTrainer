@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import DonationButton from '@/components/DonationButton';
 import { openSourceMessage } from '@/lib/donations';
-import SnapTrainerLogo from '@/components/SnapTrainerLogo';
+import SnapTrainerIcon from '@/components/SnapTrainerIcon';
 
 const pillars = [
   {
@@ -59,8 +59,12 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background overflow-hidden">
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <SnapTrainerLogo className="h-9 w-auto" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <SnapTrainerIcon className="h-9 w-9 transition-transform duration-200 group-hover:scale-105" />
+            <span className="inline-flex items-baseline text-lg font-semibold tracking-tight">
+              <span className="text-primary">Snap</span>
+              <span className="text-foreground">Trainer</span>
+            </span>
           </Link>
 
           <nav className="flex items-center gap-2">
@@ -80,7 +84,7 @@ export default function LandingPage() {
 
       <main>
         <section className="relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.18),transparent_36%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.16),transparent_28%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(60,200,140,0.20),transparent_38%),radial-gradient(circle_at_80%_20%,rgba(80,220,160,0.14),transparent_30%)] pointer-events-none" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
             <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
               <motion.div
