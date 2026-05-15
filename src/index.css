@@ -4,79 +4,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * SnapTrainer is dark-only.
+ * Both :root and .dark resolve to the same graphite/mint palette so
+ * any component that toggles the dark class still gets the brand look.
+ */
 @layer base {
-  :root {
+  :root,
+  .dark {
     --font-sans: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    --background: 220 20% 97%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    /* Dark theme — graphite from the logo diamond, mint accent */
+    --background: 220 13% 8%;
+    --foreground: 160 15% 92%;
+    --card: 220 13% 11%;
+    --card-foreground: 160 15% 92%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 160 15% 92%;
+    --primary: 152 56% 55%;
+    --primary-foreground: 220 18% 8%;
+    --secondary: 220 10% 16%;
+    --secondary-foreground: 160 15% 92%;
+    --muted: 220 10% 16%;
+    --muted-foreground: 220 8% 60%;
+    --accent: 158 64% 60%;
+    --accent-foreground: 220 18% 8%;
+    --destructive: 0 63% 38%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 243 75% 59%;
-    --chart-1: 243 75% 59%;
-    --chart-2: 262 83% 58%;
-    --chart-3: 199 89% 48%;
-    --chart-4: 142 71% 45%;
-    --chart-5: 38 92% 50%;
+    --border: 220 10% 20%;
+    --input: 220 10% 20%;
+    --ring: 152 56% 55%;
+    --chart-1: 152 56% 55%;
+    --chart-2: 158 64% 60%;
+    --chart-3: 199 80% 56%;
+    --chart-4: 220 14% 70%;
+    --chart-5: 38 92% 56%;
     --radius: 0.75rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 243 75% 59%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 243 75% 59%;
-  }
+    --sidebar-background: 220 13% 11%;
+    --sidebar-foreground: 160 15% 92%;
+    --sidebar-primary: 152 56% 55%;
+    --sidebar-primary-foreground: 220 18% 8%;
+    --sidebar-accent: 220 10% 16%;
+    --sidebar-accent-foreground: 160 15% 92%;
+    --sidebar-border: 220 10% 20%;
+    --sidebar-ring: 152 56% 55%;
 
-  .dark {
-    --background: 224 35% 7%;
-    --foreground: 213 31% 91%;
-    --card: 224 30% 10%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 30% 10%;
-    --popover-foreground: 213 31% 91%;
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 223 25% 15%;
-    --secondary-foreground: 213 31% 91%;
-    --muted: 223 25% 15%;
-    --muted-foreground: 218 11% 55%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 223 20% 18%;
-    --input: 223 20% 18%;
-    --ring: 243 75% 59%;
-    --chart-1: 243 75% 59%;
-    --chart-2: 262 83% 58%;
-    --chart-3: 199 89% 48%;
-    --chart-4: 142 71% 45%;
-    --chart-5: 38 92% 50%;
-    --sidebar-background: 224 30% 10%;
-    --sidebar-foreground: 213 31% 91%;
-    --sidebar-primary: 243 75% 59%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 223 25% 15%;
-    --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 223 20% 18%;
-    --sidebar-ring: 243 75% 59%;
+    color-scheme: dark;
   }
 }
 

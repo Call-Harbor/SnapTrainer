@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Activity, LayoutDashboard, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import DonationButton from '@/components/DonationButton';
-import SnapTrainerLogo from '@/components/SnapTrainerLogo';
+import SnapTrainerIcon from '@/components/SnapTrainerIcon';
 
 const navItems = [
   { path: '/app', icon: LayoutDashboard, label: 'Dashboard' },
@@ -19,8 +19,12 @@ export default function AppLayout() {
       {/* Top nav */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <SnapTrainerLogo className="h-9 w-auto" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <SnapTrainerIcon className="h-9 w-9 transition-transform duration-200 group-hover:scale-105" />
+            <span className="hidden sm:inline-flex items-baseline text-lg font-semibold tracking-tight">
+              <span className="text-primary">Snap</span>
+              <span className="text-foreground">Trainer</span>
+            </span>
           </Link>
 
           <nav className="flex items-center gap-1">
